@@ -1,15 +1,51 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Gradle и Android Studio
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+
+# Локальные настройки IDE
 local.properties
+.idea/
+*.iml
+
+# Файлы логов
+*.log
+
+# Файлы отладки
+*.hprof
+
+# Кэш
+*.keystore
+.cxx/
+
+# Файлы сборки Android
+*.apk
+*.ap_
+*.aab
+
+# Инструменты сборки
+outputs/
+
+# Kotlin
+*.kotlin_module
+
+# Jetpack Compose Preview / Build cache
+.compose/
+
+# Misc
+.DS_Store
+*.orig
+*.rej
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# IntelliJ IDEA
+out/
+
+# Android Studio gradle wrapper jar
+gradle/wrapper/gradle-wrapper.jar
+
+# Google Services JSON (Firebase)
+google-services.json
