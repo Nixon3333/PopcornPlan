@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="trending">В тренде</string>
+    <string name="new_releases">Новинки</string>
+    <string name="recommendations">Рекоммендации</string>
+    <string name="show_all">Показать все</string>
+</resources>

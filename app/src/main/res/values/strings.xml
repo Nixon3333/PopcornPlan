@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Popcorn Plan</string>
+    <string name="app_name" translatable="false">Popcorn Plan</string>
+    <string name="trending">Trending</string>
+    <string name="new_releases">New Releases</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="show_all">Show all</string>
 </resources>

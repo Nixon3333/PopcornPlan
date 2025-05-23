@@ -10,39 +10,70 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.drygin.popcornplan.ui.navigation.NavItem
 import com.drygin.popcornplan.ui.navigation.NavItem.Companion.navItems
+import com.drygin.popcornplan.ui.screens.MainScreen
+import com.drygin.popcornplan.ui.theme.BackgroundColor
+import com.drygin.popcornplan.ui.viewmodel.MainScreenViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PopcornPlanApp()
+            PopcornPlan()
         }
     }
 }
 
 @Composable
-fun PopcornPlanApp() {
+fun PopcornPlan() {
+    ApplyStatusBarColor()
+    NavigationHost()
+}
+
+@Composable
+fun ApplyStatusBarColor() {
+    val systemUiController = rememberSystemUiController()
+    val statusBarColor = BackgroundColor
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = statusBarColor,
+            darkIcons = false
+        )
+    }
+}
+
+@Composable
+fun NavigationHost() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavBar(navController)}
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = navItems.first().route,
+            startDestination = NavItem.Main.route,
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable(navItems[0].route) { SearchScreen() }
-            composable(navItems[1].route) { DetailsScreen() }
-            composable(navItems[2].route) { FavoritesScreen() }
-            composable(navItems[3].route) { WatchlistScreen() }
-            composable(navItems[4].route) { PlannerScreen() }
+            composable(NavItem.Main.route) {
+                val viewModel: MainScreenViewModel = hiltViewModel()
+                MainScreen(viewModel) { }
+            }
+            composable(NavItem.Search.route) { SearchScreen() }
+            composable(NavItem.Details.route) { DetailsScreen() }
+            composable(NavItem.Favorites.route) { FavoritesScreen() }
+            composable(NavItem.Planner.route) { PlannerScreen() }
         }
     }
 }
@@ -51,17 +82,15 @@ fun PopcornPlanApp() {
 fun BottomNavBar(navController: NavHostController) {
     NavigationBar {
         val currentRoute = navController.currentBackStackEntry?.destination?.route
-        navItems.forEach { (route, label, icon) ->
+        navItems.forEach { navItem ->
             NavigationBarItem(
-                selected = currentRoute == route,
-                onClick = { navController.navigate(route) {
+                selected = currentRoute == navItem.route,
+                onClick = { navController.navigate(navItem.route) {
                     launchSingleTop = true
                     restoreState = true
                 } },
-                label = { Text(label)},
-                icon = {
-                    icon?.let { Icon(it, contentDescription = label) }
-                }
+                label = { Text(navItem.title) },
+                icon = { Icon(navItem.icon, contentDescription = navItem.title) }
             )
         }
     }
@@ -97,5 +126,5 @@ fun PlannerScreen() {
     apiLevel = 33)
 @Composable
 fun DefaultPreview() {
-    PopcornPlanApp()
+    PopcornPlan()
 }
