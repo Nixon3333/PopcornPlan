@@ -1,7 +1,6 @@
-package com.drygin.popcornplan.ui.theme
+package com.drygin.popcornplan.common.ui.theme
 
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 /**
  * Created by Drygin Nikita on 23.05.2025.

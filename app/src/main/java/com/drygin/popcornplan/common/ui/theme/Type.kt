@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.ui.theme
+package com.drygin.popcornplan.common.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

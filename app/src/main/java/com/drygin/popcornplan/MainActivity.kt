@@ -13,16 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.drygin.popcornplan.ui.navigation.NavItem
-import com.drygin.popcornplan.ui.navigation.NavItem.Companion.navItems
-import com.drygin.popcornplan.ui.screens.MainScreen
-import com.drygin.popcornplan.ui.theme.BackgroundColor
-import com.drygin.popcornplan.ui.viewmodel.MainScreenViewModel
+import androidx.navigation.navArgument
+import com.drygin.popcornplan.common.navigation.NavItem
+import com.drygin.popcornplan.common.navigation.NavItem.Companion.navItems
+import com.drygin.popcornplan.common.ui.theme.BackgroundColor
+import com.drygin.popcornplan.features.details.presentation.DetailsScreen
+import com.drygin.popcornplan.features.home.presentation.HomeScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -67,11 +68,17 @@ fun NavigationHost() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(NavItem.Main.route) {
-                val viewModel: MainScreenViewModel = hiltViewModel()
-                MainScreen(viewModel) { }
+                HomeScreen { movieId ->
+                    navController.navigate(NavItem.Details.createRoute(movieId))
+                }
             }
             composable(NavItem.Search.route) { SearchScreen() }
-            composable(NavItem.Details.route) { DetailsScreen() }
+            composable(
+                NavItem.Details.route,
+                arguments = listOf(navArgument("movieId") { type = NavType.IntType})
+            ) {
+                DetailsScreen { navController.popBackStack() }
+            }
             composable(NavItem.Favorites.route) { FavoritesScreen() }
             composable(NavItem.Planner.route) { PlannerScreen() }
         }
@@ -99,11 +106,6 @@ fun BottomNavBar(navController: NavHostController) {
 @Composable
 fun SearchScreen() {
     Text(text = "Search Screen")
-}
-
-@Composable
-fun DetailsScreen() {
-    Text(text = "Details Screen")
 }
 
 @Composable

@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.ui.theme
+package com.drygin.popcornplan.common.ui.theme
 
 import android.app.Activity
 import android.os.Build
