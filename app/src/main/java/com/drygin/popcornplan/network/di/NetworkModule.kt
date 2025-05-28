@@ -1,5 +1,7 @@
 package com.drygin.popcornplan.network.di
 
+import android.util.Log
+import com.drygin.popcornplan.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -34,6 +36,14 @@ object NetworkModule {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .addHeader("trakt-api-version", TraktApiConfig.API_VERSION)
+                    .addHeader("trakt-api-key", BuildConfig.TRAKT_API_KEY)
+                    .build()
+                Log.d("provideOkHttpClient", "BuildConfig.TRAKT_API_KEY = ${BuildConfig.TRAKT_API_KEY} ")
+                chain.proceed(request)
+            }
             .build()
     }
 
@@ -44,9 +54,14 @@ object NetworkModule {
         moshi: Moshi
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.themoviedb.org/")
+            .baseUrl(TraktApiConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
+    }
+
+    object TraktApiConfig {
+        const val BASE_URL = "https://api.trakt.tv/"
+        const val API_VERSION = "2"
     }
 }

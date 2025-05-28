@@ -1,9 +1,21 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
+
+android.buildFeatures.buildConfig = true
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+val traktApiKey: String = localProperties.getProperty("traktApiKey", "")
 
 android {
     namespace = "com.drygin.popcornplan"
@@ -20,6 +32,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "TRAKT_API_KEY", "\"${traktApiKey}\"")
     }
 
     buildTypes {

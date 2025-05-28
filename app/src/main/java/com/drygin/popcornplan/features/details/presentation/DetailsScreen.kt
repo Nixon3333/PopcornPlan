@@ -63,7 +63,7 @@ fun DetailsScreen(
                     .padding(Dimens.PaddingMedium)
             ) {
                 AsyncImage(
-                    model = it.posterUrl,
+                    model = "https://" + it.images.banner.firstOrNull(),
                     contentDescription = it.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -72,11 +72,11 @@ fun DetailsScreen(
                         .clip(RoundedCornerShape(12.dp))
                 )
                 Spacer(modifier = Modifier.height(Dimens.VerticalListSpacing))
-                Text(text = it.title, style = MaterialTheme.typography.headlineMedium)
+                Text(text = it.title ?: "Нет тайтла", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(Dimens.PaddingSmall))
                 Text("Год: ${it.year}", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(Dimens.VerticalListSpacing))
-                Text("Описание: ${it.description}", style = MaterialTheme.typography.bodyLarge)
+                Text("Описание: ${it.overview}", style = MaterialTheme.typography.bodyLarge)
             }
         } ?: Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center

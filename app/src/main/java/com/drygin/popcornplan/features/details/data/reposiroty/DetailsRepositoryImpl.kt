@@ -1,8 +1,8 @@
 package com.drygin.popcornplan.features.details.data.reposiroty
 
+import com.drygin.popcornplan.common.data.mapper.toDomain
+import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.details.data.api.MovieDetailsApi
-import com.drygin.popcornplan.features.details.data.mapper.toDomain
-import com.drygin.popcornplan.features.details.domain.model.MovieDetails
 import com.drygin.popcornplan.features.details.domain.repository.IDetailsRepository
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DetailsRepositoryImpl @Inject constructor(
     private val api: MovieDetailsApi
 ) : IDetailsRepository {
-    override suspend fun getMovieDetails(movieId: Int): MovieDetails {
+    override suspend fun getMovieDetails(movieId: Int): Movie {
         return api.getMovieDetails(movieId).toDomain()
     }
 }

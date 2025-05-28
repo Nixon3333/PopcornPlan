@@ -3,8 +3,8 @@ package com.drygin.popcornplan.features.details.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.details.domain.repository.IDetailsRepository
-import com.drygin.popcornplan.features.home.domain.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +27,7 @@ class DetailsScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getMovieDetails(movieId)
+            _movie.value = repository.getMovieDetails(movieId)
         }
     }
 }
