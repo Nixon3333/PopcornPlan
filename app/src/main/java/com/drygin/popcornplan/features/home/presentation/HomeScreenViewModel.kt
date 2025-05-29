@@ -5,15 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.UiState
+import com.drygin.popcornplan.common.utils.collectToUiState
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,22 +50,5 @@ class HomeScreenViewModel @Inject constructor(
                 _isRefreshing.value = false
             }
         }
-    }
-
-    private suspend fun Flow<Result<List<Movie>>>.collectToUiState(stateFlow: MutableStateFlow<UiState<List<Movie>>>) {
-        this
-            .onStart { stateFlow.value = UiState.Loading }
-            .catch {
-                e -> stateFlow.value = UiState.Error(e.stackTraceToString())
-                Log.e("HomeScreenViewModel", "collectToUiState error: ${e.stackTraceToString()}")
-            }
-            .collect { result ->
-                result
-                    .onSuccess { movies -> stateFlow.value = UiState.Success(movies) }
-                    .onFailure {
-                        e -> stateFlow.value = UiState.Error(e.stackTraceToString())
-                        Log.e("HomeScreenViewModel", "collectToUiState error: ${e.stackTraceToString()}")
-                    }
-            }
     }
 }

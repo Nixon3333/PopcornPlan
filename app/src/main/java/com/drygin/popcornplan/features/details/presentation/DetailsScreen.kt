@@ -63,7 +63,7 @@ fun DetailsScreen(
                     .padding(Dimens.PaddingMedium)
             ) {
                 AsyncImage(
-                    model = "https://" + it.images.banner.firstOrNull(),
+                    model = "https://" + it.images?.banner?.firstOrNull(),
                     contentDescription = it.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

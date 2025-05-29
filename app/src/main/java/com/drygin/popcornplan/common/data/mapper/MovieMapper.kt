@@ -35,7 +35,7 @@ fun MovieDto.toDomain(): Movie =
         originalTitle = original_title,
         afterCredits = after_credits,
         duringCredits = during_credits,
-        images = images.toDomain()
+        images = images?.toDomain()
     )
 
 fun IdsDto.toDomain(): Ids =

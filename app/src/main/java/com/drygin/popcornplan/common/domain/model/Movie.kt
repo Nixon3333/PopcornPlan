@@ -27,7 +27,7 @@ data class Movie(
     val originalTitle: String?,
     val afterCredits: Boolean?,
     val duringCredits: Boolean?,
-    val images: Images
+    val images: Images?
 )
 
 data class Ids(

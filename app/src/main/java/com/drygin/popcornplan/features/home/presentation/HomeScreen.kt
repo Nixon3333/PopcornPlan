@@ -227,7 +227,7 @@ fun MovieCard(movie: Movie, onClick: () -> Unit) {
             .clickable(onClick = onClick)
     ) {
         AsyncImage(
-            model = "https://" + movie.images.poster.firstOrNull(),
+            model = "https://" + movie.images?.poster?.firstOrNull(),
             contentDescription = movie.title,
             modifier = Modifier
                 .height(Dimens.MovieCardHeight)

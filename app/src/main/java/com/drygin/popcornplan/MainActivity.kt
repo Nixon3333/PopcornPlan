@@ -24,6 +24,7 @@ import com.drygin.popcornplan.common.navigation.NavItem.Companion.navItems
 import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.features.details.presentation.DetailsScreen
 import com.drygin.popcornplan.features.home.presentation.HomeScreen
+import com.drygin.popcornplan.features.search.presentation.SearchScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -60,7 +61,7 @@ fun ApplyStatusBarColor() {
 fun NavigationHost() {
     val navController = rememberNavController()
     Scaffold(
-        bottomBar = { BottomNavBar(navController)}
+        bottomBar = { BottomNavBar(navController) }
     ) { paddingValues ->
         NavHost(
             navController = navController,
@@ -72,10 +73,14 @@ fun NavigationHost() {
                     navController.navigate(NavItem.Details.createRoute(movieId))
                 }
             }
-            composable(NavItem.Search.route) { SearchScreen() }
+            composable(NavItem.Search.route) {
+                SearchScreen { movieId ->
+                    navController.navigate(NavItem.Details.createRoute(movieId))
+                }
+            }
             composable(
                 NavItem.Details.route,
-                arguments = listOf(navArgument("movieId") { type = NavType.IntType})
+                arguments = listOf(navArgument("movieId") { type = NavType.IntType })
             ) {
                 DetailsScreen { navController.popBackStack() }
             }
@@ -92,20 +97,17 @@ fun BottomNavBar(navController: NavHostController) {
         navItems.forEach { navItem ->
             NavigationBarItem(
                 selected = currentRoute == navItem.route,
-                onClick = { navController.navigate(navItem.route) {
-                    launchSingleTop = true
-                    restoreState = true
-                } },
+                onClick = {
+                    navController.navigate(navItem.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 label = { Text(navItem.title) },
                 icon = { Icon(navItem.icon, contentDescription = navItem.title) }
             )
         }
     }
-}
-
-@Composable
-fun SearchScreen() {
-    Text(text = "Search Screen")
 }
 
 @Composable
@@ -125,7 +127,8 @@ fun PlannerScreen() {
 
 @Preview(
     showBackground = true,
-    apiLevel = 33)
+    apiLevel = 33
+)
 @Composable
 fun DefaultPreview() {
     PopcornPlan()

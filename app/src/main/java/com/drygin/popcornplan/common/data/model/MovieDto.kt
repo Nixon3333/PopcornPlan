@@ -28,7 +28,7 @@ data class MovieDto(
     val original_title: String?,
     val after_credits: Boolean?,
     val during_credits: Boolean?,
-    val images: ImagesDto
+    val images: ImagesDto?
 )
 
 data class IdsDto(
