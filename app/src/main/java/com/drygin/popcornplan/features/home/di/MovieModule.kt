@@ -1,5 +1,6 @@
 package com.drygin.popcornplan.features.home.di
 
+import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.features.home.data.api.MovieApi
 import com.drygin.popcornplan.features.home.data.repository.MovieRepositoryImpl
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
@@ -26,8 +27,9 @@ object MovieModule {
     @Provides
     @Singleton
     fun provideMovieRepository(
-        api: MovieApi
+        api: MovieApi,
+        dao: MovieDao
     ) : IMovieRepository {
-        return MovieRepositoryImpl(api)
+        return MovieRepositoryImpl(api, dao)
     }
 }

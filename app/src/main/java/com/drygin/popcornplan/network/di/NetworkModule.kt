@@ -1,6 +1,5 @@
 package com.drygin.popcornplan.network.di
 
-import android.util.Log
 import com.drygin.popcornplan.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -41,7 +40,6 @@ object NetworkModule {
                     .addHeader("trakt-api-version", TraktApiConfig.API_VERSION)
                     .addHeader("trakt-api-key", BuildConfig.TRAKT_API_KEY)
                     .build()
-                Log.d("provideOkHttpClient", "BuildConfig.TRAKT_API_KEY = ${BuildConfig.TRAKT_API_KEY} ")
                 chain.proceed(request)
             }
             .build()

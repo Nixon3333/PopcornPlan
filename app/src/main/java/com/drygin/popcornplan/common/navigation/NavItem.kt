@@ -21,7 +21,7 @@ sealed class NavItem(val route: String, val icon: ImageVector, val title: String
 
     companion object {
         val navItems = listOf(
-            Main, Search, Favorites, Details, Planner
+            Main, Search, Favorites, Planner
         )
     }
 }

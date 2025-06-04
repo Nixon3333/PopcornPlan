@@ -69,7 +69,7 @@ fun SearchScreen(
             is UiState.Success -> {
                 LazyColumn {
                     items(state.data) { searchItem ->
-                        MovieItem(searchItem.movie) { onMovieClick(searchItem.movie.ids.trakt ?: 0) }
+                        MovieItem(searchItem.movie) { onMovieClick(searchItem.movie.ids.trakt) }
                     }
                 }
             }
@@ -96,7 +96,7 @@ fun MovieItem(movie: Movie, onMovieClick: () -> Unit) {
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
             AsyncImage(
-                model = "https://" + movie.images?.poster?.firstOrNull(),
+                model = "https://" + movie.images.poster.firstOrNull(),
                 contentDescription = movie.title,
                 modifier = Modifier.size(80.dp)
             )

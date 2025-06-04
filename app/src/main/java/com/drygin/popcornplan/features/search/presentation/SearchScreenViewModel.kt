@@ -7,15 +7,18 @@ import com.drygin.popcornplan.common.utils.collectToUiState
 import com.drygin.popcornplan.features.search.domain.model.SearchItem
 import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 28.05.2025.
  */
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
     private val repository: ISearchRepository
@@ -27,11 +30,18 @@ class SearchScreenViewModel @Inject constructor(
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    fun onQueryChanged(newQuery: String) {
+    init {
         viewModelScope.launch {
-            delay(300)
-            _query.value = newQuery
-            repository.searchMovie(newQuery).collectToUiState(_uiState)
+            _query
+                .debounce(300)
+                .distinctUntilChanged()
+                .collect { query ->
+                    repository.searchMovie(query).collectToUiState(_uiState)
+                }
         }
+    }
+
+    fun onQueryChanged(newQuery: String) {
+        _query.value = newQuery
     }
 }

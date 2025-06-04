@@ -1,5 +1,6 @@
 package com.drygin.popcornplan.common.data.mapper
 
+import com.drygin.popcornplan.common.data.local.entity.MovieEntity
 import com.drygin.popcornplan.common.data.model.IdsDto
 import com.drygin.popcornplan.common.data.model.ImagesDto
 import com.drygin.popcornplan.common.data.model.MovieDto
@@ -35,7 +36,17 @@ fun MovieDto.toDomain(): Movie =
         originalTitle = original_title,
         afterCredits = after_credits,
         duringCredits = during_credits,
-        images = images?.toDomain()
+        images = images.toDomain()
+    )
+
+fun MovieEntity.toDomain(): Movie =
+    Movie(
+        ids = Ids(id),
+        title = title,
+        year = year,
+        watchers = watchers,
+        isFavorite = favorite,
+        images = Images(poster = listOf(posterUrl))
     )
 
 fun IdsDto.toDomain(): Ids =

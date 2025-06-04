@@ -23,6 +23,7 @@ import com.drygin.popcornplan.common.navigation.NavItem
 import com.drygin.popcornplan.common.navigation.NavItem.Companion.navItems
 import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.features.details.presentation.DetailsScreen
+import com.drygin.popcornplan.features.favorite.presentation.FavoriteScreen
 import com.drygin.popcornplan.features.home.presentation.HomeScreen
 import com.drygin.popcornplan.features.search.presentation.SearchScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -84,7 +85,11 @@ fun NavigationHost() {
             ) {
                 DetailsScreen { navController.popBackStack() }
             }
-            composable(NavItem.Favorites.route) { FavoritesScreen() }
+            composable(NavItem.Favorites.route) {
+                FavoriteScreen { movieId ->
+                    navController.navigate(NavItem.Details.createRoute(movieId))
+                }
+            }
             composable(NavItem.Planner.route) { PlannerScreen() }
         }
     }
@@ -108,11 +113,6 @@ fun BottomNavBar(navController: NavHostController) {
             )
         }
     }
-}
-
-@Composable
-fun FavoritesScreen() {
-    Text(text = "Favorites Screen")
 }
 
 @Composable

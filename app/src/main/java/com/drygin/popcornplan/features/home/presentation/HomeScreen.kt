@@ -13,14 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -58,15 +65,17 @@ fun HomeScreen(
 ) {
     val newReleasesState by viewModel.newReleasesState.collectAsState()
     val trendingState by viewModel.trendingState.collectAsState()
-    val recommendationsState by viewModel.recommendationsState.collectAsState()
+    val popularState by viewModel.popularState.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     HomeScreen(
         trendingState = trendingState,
-        recommendationsState = recommendationsState,
+        popularState = popularState,
         isRefreshing = isRefreshing,
-        onRefresh = { viewModel.fetchNewMovies() },
-        onMovieClick = onMovieClick
+        onRefresh = { viewModel.refresh() },
+        onMovieClick = onMovieClick,
+        onToggleFavorite = { viewModel.refresh() },
+        viewModel
     )
 }
 
@@ -74,12 +83,14 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     trendingState: UiState<List<Movie>>,
-    recommendationsState: UiState<List<Movie>>,
+    popularState: UiState<List<Movie>>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    onToggleFavorite: (Int) -> Unit,
+    viewModel: HomeScreenViewModel
 ) {
-    PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = { onRefresh() }) {
+    PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = { viewModel.refresh() }) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,7 +113,7 @@ fun HomeScreen(
                         }
                     }
                     is UiState.Success -> {
-                        HorizontalMovieList(movieIds = trendingState.data, onMovieClick = onMovieClick)
+                        HorizontalMovieList(movieIds = trendingState.data, onMovieClick = onMovieClick, onToggleFavorite = onToggleFavorite, viewModel = viewModel)
                     }
                     is UiState.Error -> {
                         // Показываем ошибку и кнопку "Повторить"
@@ -114,7 +125,7 @@ fun HomeScreen(
                         ) {
                             Text(text = "Ошибка загрузки: ${trendingState.message}")
                             Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = onRefresh) {
+                            Button(onClick = { viewModel.refresh() }) {
                                 Text("Попробовать снова")
                             }
                         }
@@ -123,9 +134,9 @@ fun HomeScreen(
             }
             item {
                 SectionTitle(
-                    title = stringResource(R.string.recommendations),
+                    title = stringResource(R.string.popular),
                     onShowAllClick = { /* TODO: */ })
-                when (recommendationsState) {
+                when (popularState) {
                     is UiState.Loading -> {
                         Box(
                             modifier = Modifier
@@ -137,7 +148,7 @@ fun HomeScreen(
                         }
                     }
                     is UiState.Success -> {
-                        HorizontalMovieList(movieIds = recommendationsState.data, onMovieClick = onMovieClick)
+                        HorizontalMovieList(movieIds = popularState.data, onMovieClick = onMovieClick, onToggleFavorite, viewModel)
                     }
                     is UiState.Error -> {
                         // Показываем ошибку и кнопку "Повторить"
@@ -147,9 +158,9 @@ fun HomeScreen(
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = "Ошибка загрузки: ${recommendationsState.message}")
+                            Text(text = "Ошибка загрузки: ${popularState.message}")
                             Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = onRefresh) {
+                            Button(onClick = { viewModel.refresh() }) {
                                 Text("Попробовать снова")
                             }
                         }
@@ -208,33 +219,84 @@ fun SectionTitle(title: String, onShowAllClick: () -> Unit) {
 }
 
 @Composable
-fun HorizontalMovieList(movieIds: List<Movie>, onMovieClick: (Int) -> Unit) {
+fun HorizontalMovieList(movieIds: List<Movie>, onMovieClick: (Int) -> Unit, onToggleFavorite: (Int) -> Unit,
+                        viewModel: HomeScreenViewModel) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
         horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing)
     ) {
         items(movieIds) { movie ->
-            MovieCard(movie = movie, onClick = { onMovieClick(movie.ids.trakt ?: 0) })
+            MovieCard(movie = movie, onClick = { onMovieClick(movie.ids.trakt) }, onToggleFavorite = { viewModel.onToggleFavorite(movie.ids.trakt) } )
         }
     }
 }
 
 @Composable
-fun MovieCard(movie: Movie, onClick: () -> Unit) {
+fun MovieCard(
+    movie: Movie,
+    onToggleFavorite: (Int) -> Unit,
+    onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(Dimens.MovieCardWidth)
             .clickable(onClick = onClick)
     ) {
-        AsyncImage(
-            model = "https://" + movie.images?.poster?.firstOrNull(),
-            contentDescription = movie.title,
-            modifier = Modifier
-                .height(Dimens.MovieCardHeight)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius)),
-            contentScale = ContentScale.Crop
-        )
+        Box {
+            AsyncImage(
+                model = "https://" + movie.images.poster.firstOrNull(),
+                contentDescription = movie.title,
+                modifier = Modifier
+                    .height(Dimens.MovieCardHeight)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius)),
+                contentScale = ContentScale.Crop
+            )
+
+            // Иконка избранного в верхнем левом углу
+            IconButton(
+                onClick = { onToggleFavorite(movie.ids.trakt) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = if (movie.isFavorite) "Убрать из избранного" else "Добавить в избранное",
+                    tint = if (movie.isFavorite) Color.Red else Color.White
+                )
+            }
+
+            if (movie.watchers != 0) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Face,
+                        contentDescription = "Watching count",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = movie.watchers.toString(),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(Dimens.VerticalItemSpacing))
         Text(
             text = movie.title ?: "",

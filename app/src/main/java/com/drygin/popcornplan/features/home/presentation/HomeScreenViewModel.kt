@@ -1,6 +1,5 @@
 package com.drygin.popcornplan.features.home.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drygin.popcornplan.common.domain.model.Movie
@@ -21,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: IMovieRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _newReleasesState = MutableStateFlow<UiState<List<Movie>>>(UiState.Loading)
     val newReleasesState = _newReleasesState.asStateFlow()
@@ -29,26 +28,38 @@ class HomeScreenViewModel @Inject constructor(
     private val _trendingState = MutableStateFlow<UiState<List<Movie>>>(UiState.Loading)
     val trendingState = _trendingState.asStateFlow()
 
-    private val _recommendationsState = MutableStateFlow<UiState<List<Movie>>>(UiState.Loading)
-    val recommendationsState = _recommendationsState.asStateFlow()
+    private val _popularState = MutableStateFlow<UiState<List<Movie>>>(UiState.Loading)
+    val popularState = _popularState.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+    // TODO: Нужно завести разные таблицы (или таблицу-словарь по типу контента
+
     init {
-        fetchNewMovies()
-    }
-    fun fetchNewMovies() {
-        _isRefreshing.value = true
         viewModelScope.launch {
-            try {
-                async {
-                    repository.getTrendingMovies().collectToUiState(_trendingState)
-                }.await()
-            }  catch (e: Exception) {
-                Log.e("HomeScreenViewModel", "Error fetching movies", e)
-            } finally {
-                _isRefreshing.value = false
+            launch {
+                repository.getCacheTrendingMovies().collectToUiState(_trendingState)
             }
+            launch {
+                repository.getCachePopularMovies().collectToUiState(_popularState)
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            async {
+                repository.refreshTrendingMovies()
+            }.await()
+            _isRefreshing.value = false
+        }
+    }
+
+    fun onToggleFavorite(movieId: Int) {
+        viewModelScope.launch {
+            repository.updateFavorite(movieId)
         }
     }
 }
