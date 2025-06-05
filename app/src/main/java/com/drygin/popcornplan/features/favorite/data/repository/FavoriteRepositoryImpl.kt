@@ -17,10 +17,10 @@ class FavoriteRepositoryImpl @Inject constructor(
     val dao: MovieDao
 ) : IFavoriteRepository {
     override suspend fun getFavoriteMovies(): Flow<List<Movie>> =
-        dao.getMovies()
+        dao.movies()
             .map { entities ->
                 entities
-                    .filter { it.favorite }
+                    .filter { it.movieEntity.favorite }
                     .map { it.toDomain() }
             }
 

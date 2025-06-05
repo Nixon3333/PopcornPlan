@@ -1,9 +1,11 @@
 package com.drygin.popcornplan.features.home.data.repository
 
 import android.util.Log
+import com.drygin.popcornplan.common.data.local.dao.ImageDao
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
-import com.drygin.popcornplan.common.data.local.entity.MovieEntity.Companion.fromDto
 import com.drygin.popcornplan.common.data.mapper.toDomain
+import com.drygin.popcornplan.common.data.mapper.toEntities
+import com.drygin.popcornplan.common.data.mapper.toEntity
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.home.data.api.MovieApi
 import com.drygin.popcornplan.features.home.data.mapper.toMovieDto
@@ -20,10 +22,11 @@ import javax.inject.Inject
  */
 class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApi,
-    private val dao: MovieDao
+    private val movieDao: MovieDao,
+    private val imageDao: ImageDao
 ) : IMovieRepository {
 
-    override fun getCacheTrendingMovies() = dao.getTrendingMovies().map { result ->
+    override fun getCacheTrendingMovies() = movieDao.getTrendingMovies().map { result ->
         Result.success(result.map { it.toDomain() })
     }
 
@@ -31,9 +34,12 @@ class MovieRepositoryImpl @Inject constructor(
         val trending = api.getTrendingMovies().map { it.toMovieDto() }
         val popular = api.getPopularMovies()
         val response = trending + popular
-        //dao.clearAll()
+        movieDao.insertAll(response.map { it.toEntity() })
+        response.forEach { movieDto ->
+            val imageEntities = movieDto.images.toEntities(movieDto.ids.trakt)
+            imageDao.insertAll(imageEntities)
+        }
         // TODO: Искать избранные и проставлять favorite через upsert
-        dao.insertAll(response.map { fromDto(it) })
     }
 
     override fun getTrendingMovies(): Flow<Result<List<Movie>>> = flow {
@@ -48,7 +54,7 @@ class MovieRepositoryImpl @Inject constructor(
     }
 
     override fun getCachePopularMovies(): Flow<Result<List<Movie>>> =
-        dao.getMovies().map { result ->
+        movieDao.movies().map { result ->
             Result.success(result.map { it.toDomain() })
         }
 
@@ -65,8 +71,8 @@ class MovieRepositoryImpl @Inject constructor(
 
     override suspend fun updateFavorite(movieId: Int) {
         withContext(Dispatchers.IO) {
-            dao.getMovie(movieId)?.let {
-                dao.insertAll(listOf(it.copy(favorite = !it.favorite)))
+            movieDao.getMovie(movieId)?.let {
+                movieDao.insertAll(listOf(it.copy(favorite = !it.favorite)))
             }
         }
     }

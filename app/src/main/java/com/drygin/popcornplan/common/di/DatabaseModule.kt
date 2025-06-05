@@ -33,4 +33,7 @@ object DatabaseModule {
 
     @Provides
     fun provideReminderDao(database: AppDatabase) = database.reminderDao()
+
+    @Provides
+    fun provideImageDao(database: AppDatabase) = database.mediaImageDao()
 }

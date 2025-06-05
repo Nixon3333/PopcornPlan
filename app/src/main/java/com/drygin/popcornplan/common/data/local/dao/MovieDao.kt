@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.drygin.popcornplan.common.data.local.entity.MovieEntity
+import com.drygin.popcornplan.common.data.local.entity.MovieWithImages
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -13,13 +15,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MovieDao {
     @Query("select * from movies")
-    fun getMovies(): Flow<List<MovieEntity>>
+    fun movies(): Flow<List<MovieWithImages>>
 
-    @Query("select * from movies where id =:movieId")
-    fun getMovie(movieId: Int): MovieEntity?
+    @Query("select * from movies where traktId =:traktId")
+    fun getMovie(traktId: Int): MovieEntity?
+
+    @Transaction
+    @Query("select * from movies where traktId =:traktId")
+    fun movieWithImages(traktId: Int): MovieWithImages?
 
     @Query("select * from movies where watchers != 0")
-    fun getTrendingMovies(): Flow<List<MovieEntity>>
+    fun getTrendingMovies(): Flow<List<MovieWithImages>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(movies: List<MovieEntity>)

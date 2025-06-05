@@ -31,19 +31,3 @@ data class Movie(
     val duringCredits: Boolean = false,
     val images: Images = Images()
 )
-
-data class Ids(
-    val trakt: Int = 0,
-    val slug: String = "",
-    val imdb: String? = "",
-    val tmdb: Int = 0
-)
-
-data class Images(
-    val fanart: List<String> = emptyList(),
-    val poster: List<String> = emptyList(),
-    val logo: List<String> = emptyList(),
-    val clearart: List<String> = emptyList(),
-    val banner: List<String> = emptyList(),
-    val thumb: List<String> = emptyList()
-)

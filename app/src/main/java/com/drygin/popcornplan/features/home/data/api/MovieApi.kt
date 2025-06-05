@@ -10,13 +10,6 @@ import retrofit2.http.Query
  */
 const val LIMIT = 10
 interface MovieApi {
-    /*@GET("movies/updates")
-    suspend fun getMoviesId(
-        //@Query("start_date") startDate: String,
-        @Query("limit") limit: Int = LIMIT,
-        @Query("page") page: Int = 1
-    ): List<MovieResponseDto>*/
-
     @GET("movies/trending")
     suspend fun getTrendingMovies(
         @Query("limit") limit: Int = LIMIT,
