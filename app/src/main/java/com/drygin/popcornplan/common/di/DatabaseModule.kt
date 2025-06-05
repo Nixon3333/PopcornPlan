@@ -30,4 +30,7 @@ object DatabaseModule {
 
     @Provides
     fun provideMovieDao(database: AppDatabase) = database.movieDao()
+
+    @Provides
+    fun provideReminderDao(database: AppDatabase) = database.reminderDao()
 }

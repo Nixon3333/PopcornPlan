@@ -87,6 +87,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.system.ui.controller)
+    implementation(libs.hilt.work)
 
     // Retrofit
     implementation(libs.retrofit)
@@ -104,6 +105,9 @@ dependencies {
     // Room
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    // WorkManager
+    implementation(libs.androidx.work)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
