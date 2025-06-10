@@ -7,9 +7,11 @@ import com.drygin.popcornplan.common.domain.model.ImageType
 /**
  * Created by Drygin Nikita on 05.06.2025.
  */
-@Entity(tableName = "images")
+@Entity(
+    tableName = "images",
+    primaryKeys = ["mediaTraktId", "type"]
+)
 data class ImageEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val mediaTraktId: Int,
     val type: String, // fanart, poster, etc
     val url: String

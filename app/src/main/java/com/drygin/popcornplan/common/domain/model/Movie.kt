@@ -1,11 +1,14 @@
 package com.drygin.popcornplan.common.domain.model
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Created by Drygin Nikita on 22.05.2025.
  */
+@Immutable
 data class Movie(
     val title: String = "No title",
-    val year: Int? = 1970,
+    val year: Int = 1970,
     val ids: Ids = Ids(),
     val tagline: String = "",
     val watchers: Int = 0,
@@ -14,7 +17,7 @@ data class Movie(
     val released: String = "",
     val runtime: Int = 0,
     val country: String = "",
-    val trailer: String = "",
+    val trailer: String? = "",
     val homepage: String? = "",
     val status: String = "",
     val rating: Double = 0.0,

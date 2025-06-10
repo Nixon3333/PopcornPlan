@@ -1,18 +1,24 @@
 package com.drygin.popcornplan.features.home.data.repository
 
-import android.util.Log
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.map
 import com.drygin.popcornplan.common.data.local.dao.ImageDao
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
+import com.drygin.popcornplan.common.data.local.dao.TrendingDao
+import com.drygin.popcornplan.common.data.local.entity.MovieWithImages
+import com.drygin.popcornplan.common.data.local.entity.TrendingMovieEntity
 import com.drygin.popcornplan.common.data.mapper.toDomain
-import com.drygin.popcornplan.common.data.mapper.toEntities
-import com.drygin.popcornplan.common.data.mapper.toEntity
 import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.utils.TransactionRunner
 import com.drygin.popcornplan.features.home.data.api.MovieApi
-import com.drygin.popcornplan.features.home.data.mapper.toMovieDto
+import com.drygin.popcornplan.features.home.data.paging.TrendingMoviesRemoteMediator
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -23,49 +29,39 @@ import javax.inject.Inject
 class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApi,
     private val movieDao: MovieDao,
-    private val imageDao: ImageDao
+    private val imageDao: ImageDao,
+    private val trendingMovieDao: TrendingDao,
+    private val transactionRunner: TransactionRunner
 ) : IMovieRepository {
 
-    override fun getCacheTrendingMovies() = movieDao.getTrendingMovies().map { result ->
-        Result.success(result.map { it.toDomain() })
-    }
+    private var pagingSource: PagingSource<Int, MovieWithImages>? = null
 
-    override suspend fun refreshTrendingMovies() {
-        val trending = api.getTrendingMovies().map { it.toMovieDto() }
-        val popular = api.getPopularMovies()
-        val response = trending + popular
-        movieDao.insertAll(response.map { it.toEntity() })
-        response.forEach { movieDto ->
-            val imageEntities = movieDto.images.toEntities(movieDto.ids.trakt)
-            imageDao.insertAll(imageEntities)
-        }
-        // TODO: Искать избранные и проставлять favorite через upsert
-    }
-
-    override fun getTrendingMovies(): Flow<Result<List<Movie>>> = flow {
-        try {
-            val dtoList = api.getTrendingMovies()
-            val movies = dtoList.map { it.toMovieDto() }.map { it.toDomain() }
-            movies.forEach { Log.d("movies::", "getTrendingMovies: $it") }
-            emit(Result.success(movies))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
-        }
-    }
-
-    override fun getCachePopularMovies(): Flow<Result<List<Movie>>> =
-        movieDao.movies().map { result ->
-            Result.success(result.map { it.toDomain() })
+    @OptIn(ExperimentalPagingApi::class)
+    fun getMovies(): Flow<PagingData<Movie>> {
+        val pagingSourceFactory = {
+            //val source = trendingMovieDao.getTrendingMovies()
+            val source = movieDao.getPagedMovies()
+            pagingSource = source
+            source
         }
 
-    override fun getPopularMovies(): Flow<Result<List<Movie>>> = flow {
-        try {
-            val dtoList = api.getPopularMovies()
-            val movies = dtoList.map { it.toDomain() }
-            movies.forEach { Log.d("movies::", "getPopularMovies: $it") }
-            emit(Result.success(movies))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20, //todo Пробросить значение
+                initialLoadSize = 20,
+                prefetchDistance = 5),
+            remoteMediator = TrendingMoviesRemoteMediator(
+                api,
+                movieDao,
+                imageDao,
+                trendingMovieDao,
+                withTransaction = transactionRunner::run
+            ),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow.map { pagingData ->
+            pagingData.map { movieWithImages ->
+                movieWithImages.toDomain()
+            }
         }
     }
 

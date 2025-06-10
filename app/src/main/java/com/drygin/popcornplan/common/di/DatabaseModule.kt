@@ -35,5 +35,8 @@ object DatabaseModule {
     fun provideReminderDao(database: AppDatabase) = database.reminderDao()
 
     @Provides
-    fun provideImageDao(database: AppDatabase) = database.mediaImageDao()
+    fun provideImageDao(database: AppDatabase) = database.imageDao()
+
+    @Provides
+    fun provideTrendingDao(database: AppDatabase) = database.trendingDao()
 }

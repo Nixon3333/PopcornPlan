@@ -7,5 +7,6 @@ import com.drygin.popcornplan.common.domain.model.Movie
  */
 data class TrendingMovie(
     val watchers: Int,
-    val movie: Movie
+    val movie: Movie,
+    val page: Int
 )

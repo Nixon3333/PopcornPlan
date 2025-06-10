@@ -1,5 +1,6 @@
 package com.drygin.popcornplan.common.data.local.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,6 +17,12 @@ import kotlinx.coroutines.flow.Flow
 interface MovieDao {
     @Query("select * from movies")
     fun movies(): Flow<List<MovieWithImages>>
+
+    @Query("select * from movies where traktId in (:ids)")
+    fun getMoviesByIds(ids: List<Int>): List<MovieEntity>
+
+    @Query("SELECT * FROM movies ORDER BY pageIndex ASC, watchers DESC")
+    fun getPagedMovies(): PagingSource<Int, MovieWithImages>
 
     @Query("select * from movies where traktId =:traktId")
     fun getMovie(traktId: Int): MovieEntity?

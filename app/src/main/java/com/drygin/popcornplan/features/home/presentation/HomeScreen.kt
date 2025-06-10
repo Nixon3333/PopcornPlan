@@ -1,5 +1,7 @@
 package com.drygin.popcornplan.features.home.presentation
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,15 +18,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,21 +40,36 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.drygin.popcornplan.R
+import com.drygin.popcornplan.common.domain.model.Images
 import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.common.ui.UiState
+//import com.drygin.popcornplan.common.domain.model.MovieUI
 import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.common.ui.theme.Dimens
 
@@ -58,115 +77,72 @@ import com.drygin.popcornplan.common.ui.theme.Dimens
 /**
  * Created by Drygin Nikita on 22.05.2025.
  */
-@Composable
-fun HomeScreen(
-    viewModel: HomeScreenViewModel = hiltViewModel(),
-    onMovieClick: (Int) -> Unit
-) {
-    val newReleasesState by viewModel.newReleasesState.collectAsState()
-    val trendingState by viewModel.trendingState.collectAsState()
-    val popularState by viewModel.popularState.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-
-    HomeScreen(
-        trendingState = trendingState,
-        popularState = popularState,
-        isRefreshing = isRefreshing,
-        onRefresh = { viewModel.refresh() },
-        onMovieClick = onMovieClick,
-        onToggleFavorite = { viewModel.refresh() },
-        viewModel
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    trendingState: UiState<List<Movie>>,
-    popularState: UiState<List<Movie>>,
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit,
+    viewModel: HomeScreenViewModel,
     onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit,
-    viewModel: HomeScreenViewModel
+    onToggleFavorite: (Int) -> Unit
 ) {
-    PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = { viewModel.refresh() }) {
+    val recompositionCounter = remember { mutableIntStateOf(0) }
+    SideEffect {
+        recompositionCounter.intValue++
+        Log.d("RECOMPOSE", "HomeScreen recomposed ${recompositionCounter.intValue} times")
+    }
+
+    val movies = viewModel.movies.collectAsLazyPagingItems()
+    val isRefreshing = movies.loadState.refresh == LoadState.Loading
+
+    val horizontalListState = rememberLazyListState()
+
+    // Скроллим вверх, когда refresh завершается
+    LaunchedEffect(movies.loadState.refresh) {
+        val refreshState = movies.loadState.refresh
+        if (refreshState is LoadState.NotLoading) {
+            horizontalListState.animateScrollToItem(0)
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { movies.refresh() },
+        modifier = Modifier
+            .background(BackgroundColor)
+            .padding(vertical = Dimens.VerticalListSpacing)
+    ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundColor)
-                .padding(vertical = Dimens.VerticalListSpacing)
+            modifier = Modifier.fillMaxSize()
         ) {
             item {
                 SectionTitle(
-                    title = stringResource(R.string.trending),
-                    onShowAllClick = { /* TODO: */ })
-                when (trendingState) {
-                    is UiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp), // примерный размер списка
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    is UiState.Success -> {
-                        HorizontalMovieList(movieIds = trendingState.data, onMovieClick = onMovieClick, onToggleFavorite = onToggleFavorite, viewModel = viewModel)
-                    }
-                    is UiState.Error -> {
-                        // Показываем ошибку и кнопку "Повторить"
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = "Ошибка загрузки: ${trendingState.message}")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.refresh() }) {
-                                Text("Попробовать снова")
-                            }
-                        }
-                    }
-                }
+                    title = stringResource(id = R.string.trending),
+                    onShowAllClick = { /* TODO */ }
+                )
             }
             item {
-                SectionTitle(
-                    title = stringResource(R.string.popular),
-                    onShowAllClick = { /* TODO: */ })
-                when (popularState) {
-                    is UiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(Dimens.MovieCardHeight),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    is UiState.Success -> {
-                        HorizontalMovieList(movieIds = popularState.data, onMovieClick = onMovieClick, onToggleFavorite, viewModel)
-                    }
-                    is UiState.Error -> {
-                        // Показываем ошибку и кнопку "Повторить"
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = "Ошибка загрузки: ${popularState.message}")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(onClick = { viewModel.refresh() }) {
-                                Text("Попробовать снова")
-                            }
-                        }
-                    }
-                }
+                HorizontalPagingMovieList(
+                    movies = movies,
+                    horizontalListState,
+                    onMovieClick = onMovieClick,
+                    onToggleFavorite = onToggleFavorite
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun ErrorItem(error: Throwable, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Ошибка загрузки: ${error.localizedMessage}")
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onRetry) {
+            Text("Попробовать снова")
         }
     }
 }
@@ -219,31 +195,103 @@ fun SectionTitle(title: String, onShowAllClick: () -> Unit) {
 }
 
 @Composable
-fun HorizontalMovieList(movieIds: List<Movie>, onMovieClick: (Int) -> Unit, onToggleFavorite: (Int) -> Unit,
-                        viewModel: HomeScreenViewModel) {
+fun HorizontalPagingMovieList(
+    movies: LazyPagingItems<Movie>,
+    listState: LazyListState,
+    onMovieClick: (Int) -> Unit,
+    onToggleFavorite: (Int) -> Unit
+) {
     LazyRow(
+        state = listState,
         contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
         horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing)
     ) {
-        items(movieIds) { movie ->
-            MovieCard(movie = movie, onClick = { onMovieClick(movie.ids.trakt) }, onToggleFavorite = { viewModel.onToggleFavorite(movie.ids.trakt) } )
+        items(movies.itemCount, key = { index -> movies.peek(index)?.ids?.trakt ?: index }) { index ->
+            movies[index]?.let { movie ->
+                MovieCard(
+                    movie,
+                    /*movie.ids.trakt,
+                    movie.title,
+                    movie.images,
+                    movie.isFavorite,
+                    movie.watchers,
+                    movie.year,*/
+                    onClick = { onMovieClick(movie.ids.trakt) },
+                    onToggleFavorite = { onToggleFavorite(movie.ids.trakt) }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun MovieCard(
+    /*id: Int,
+    title: String,
+    images: Images,
+    isFavorite: Boolean,
+    watchers: Int,
+    year: Int,*/
     movie: Movie,
-    onToggleFavorite: (Int) -> Unit,
-    onClick: () -> Unit) {
+    onToggleFavorite: () -> Unit,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+    val posterUrl = remember(movie.images.poster) {
+        "https://" + movie.images.poster.firstOrNull().orEmpty()
+    }
+
+    val imageRequest = remember(posterUrl) {
+        ImageRequest.Builder(context)
+            .data(posterUrl)
+            .crossfade(true)
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_foreground)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .build()
+    }
+    val painter = rememberAsyncImagePainter(imageRequest)
     Column(
         modifier = Modifier
             .width(Dimens.MovieCardWidth)
             .clickable(onClick = onClick)
     ) {
-        Box {
-            AsyncImage(
-                model = "https://" + movie.images.poster.firstOrNull(),
+        Box(
+            modifier = Modifier
+                .height(Dimens.MovieCardHeight)
+                .width(Dimens.MovieCardHeight)
+        ) {
+            /*AsyncImage(
+                model = posterUrl,
+                contentDescription = title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(Dimens.MovieCardHeight)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius))
+            )*/
+            /*SubcomposeAsyncImage(
+                model = imageRequest,
+                contentDescription = title,
+                loading = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.DarkGray)
+                    )
+                },
+                error = {
+                    Icon(Icons.Default.Clear, contentDescription = null, tint = Color.Red)
+                },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(Dimens.MovieCardHeight)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius))
+            )*/
+            Image(
+                painter = painter,
                 contentDescription = movie.title,
                 modifier = Modifier
                     .height(Dimens.MovieCardHeight)
@@ -252,9 +300,9 @@ fun MovieCard(
                 contentScale = ContentScale.Crop
             )
 
-            // Иконка избранного в верхнем левом углу
+            // Кнопка избранного
             IconButton(
-                onClick = { onToggleFavorite(movie.ids.trakt) },
+                onClick = { onToggleFavorite() },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(8.dp)
@@ -270,6 +318,7 @@ fun MovieCard(
                 )
             }
 
+            // Счётчик просмотров
             if (movie.watchers != 0) {
                 Row(
                     modifier = Modifier
@@ -297,14 +346,17 @@ fun MovieCard(
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(Dimens.VerticalItemSpacing))
+
         Text(
-            text = movie.title ?: "",
+            text = movie.title,
             color = Color.White,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodyMedium
         )
+
         Text(
             text = movie.year.toString(),
             color = Color.Gray,

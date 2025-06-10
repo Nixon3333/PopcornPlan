@@ -41,13 +41,13 @@ fun FavoriteScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(movie) {movieItem ->
+            /*items(movie) {movieItem ->
                 MovieCard(
                     movie = movieItem,
                     onToggleFavorite = { viewModel.removeFavorite(movieItem.ids.trakt) },
                     onClick = { onMovieClick(movieItem.ids.trakt) }
                 )
-            }
+            }*/
         }
     }
 }

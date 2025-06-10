@@ -8,7 +8,7 @@ import retrofit2.http.Query
 /**
  * Created by Drygin Nikita on 24.05.2025.
  */
-const val LIMIT = 10
+const val LIMIT = 20
 interface MovieApi {
     @GET("movies/trending")
     suspend fun getTrendingMovies(

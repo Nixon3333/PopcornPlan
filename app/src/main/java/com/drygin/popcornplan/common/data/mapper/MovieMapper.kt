@@ -16,46 +16,47 @@ import com.drygin.popcornplan.common.domain.model.Movie
  */
 fun MovieDto.toDomain(): Movie =
     Movie(
-        title = title,
-        year = year,
+        title = title ?: "",
+        year = year ?: 1970,
         ids = ids.toDomain(),
-        tagline = tagline,
-        overview = overview,
-        released = released,
+        tagline = tagline ?: "",
+        overview = overview ?: "",
+        released = released ?: "",
         runtime = runtime,
         country = country,
         trailer = trailer,
         homepage = homepage,
-        status = status,
+        status = status ?: "",
         rating = rating,
         votes = votes,
         commentCount = comment_count,
-        updatedAt = updated_at,
-        language = language,
+        updatedAt = updated_at ?: "",
+        language = language ?: "",
         languages = languages,
         availableTranslations = available_translations,
         genres = genres,
-        certification = certification,
-        originalTitle = original_title,
+        certification = certification ?: "",
+        originalTitle = original_title ?: "",
         afterCredits = after_credits,
         duringCredits = during_credits,
         images = images.toDomain()
     )
 
-fun MovieEntity.toDomain(images: List<ImageEntity>): Movie =
-    Movie(
+fun MovieEntity.toDomain(images: List<ImageEntity>): Movie {
+    val domainImages = images.toDomain()
+    return Movie(
         ids = Ids(traktId),
         title = title,
         year = year,
         watchers = watchers,
         isFavorite = favorite,
-        images = images.toDomain()
+        images = domainImages
     )
+}
 
 fun MovieWithImages.toDomain(): Movie {
-    return movieEntity.toDomain(images).copy(
-        images = images.toDomain()
-    )
+    val newMovie = movieEntity.toDomain(images)
+    return newMovie
 }
 
 fun List<ImageEntity>.toDomain(): Images {
@@ -78,7 +79,7 @@ fun List<ImageEntity>.toDomain(): Images {
         }
     }
 
-    return Images(
+    val images = Images(
         fanart = fanart,
         poster = poster,
         logo = logo,
@@ -86,27 +87,30 @@ fun List<ImageEntity>.toDomain(): Images {
         banner = banner,
         thumb = thumb
     )
+
+    return images
 }
 
 
-fun MovieDto.toEntity() = MovieEntity(
+fun MovieDto.toEntity(page: Int) = MovieEntity(
     traktId = this.ids.trakt,
-    slug = this.ids.slug,
-    imdb = this.ids.imdb,
+    slug = this.ids.slug ?: "",
+    imdb = this.ids.imdb ?: "",
     tmdb = this.ids.tmdb,
-    title = this.title,
+    title = this.title ?: "",
     year = this.year ?: 1970,
-    overview = this.overview,
-    releaseDate = this.released,
+    overview = this.overview ?: "",
+    releaseDate = this.released ?: "",
     rating = this.rating,
-    watchers = this.watchers
+    watchers = this.watchers,
+    pageIndex = page
 )
 
 fun IdsDto.toDomain(): Ids =
     Ids(
         trakt = trakt,
-        slug = slug,
-        imdb = imdb,
+        slug = slug ?: "",
+        imdb = imdb ?: "",
         tmdb = tmdb
     )
 

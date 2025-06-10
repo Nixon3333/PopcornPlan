@@ -14,14 +14,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.drygin.popcornplan.common.navigation.NavItem
@@ -30,6 +32,7 @@ import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.features.details.presentation.DetailsScreen
 import com.drygin.popcornplan.features.favorite.presentation.FavoriteScreen
 import com.drygin.popcornplan.features.home.presentation.HomeScreen
+import com.drygin.popcornplan.features.home.presentation.HomeScreenViewModel
 import com.drygin.popcornplan.features.reminder.presentation.RemindersScreen
 import com.drygin.popcornplan.features.search.presentation.SearchScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -81,15 +84,22 @@ fun NavigationHost() {
             startDestination = NavItem.Main.route,
             modifier = Modifier.padding(paddingValues)
         ) {
+            val onMovieClick: (Int) -> Unit = { movieId ->
+                navController.navigate(NavItem.Details.createRoute(movieId))
+            }
+
             composable(NavItem.Main.route) {
-                HomeScreen { movieId ->
-                    navController.navigate(NavItem.Details.createRoute(movieId))
+                val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+
+                val onToggleFavorite: (Int) -> Unit = { movieId ->
+                    homeScreenViewModel.onToggleFavorite(movieId)
                 }
+
+                HomeScreen(homeScreenViewModel, onMovieClick = onMovieClick,
+                    onToggleFavorite = onToggleFavorite)
             }
             composable(NavItem.Search.route) {
-                SearchScreen { movieId ->
-                    navController.navigate(NavItem.Details.createRoute(movieId))
-                }
+                SearchScreen { onMovieClick }
             }
             composable(
                 NavItem.Details.route,
@@ -98,9 +108,7 @@ fun NavigationHost() {
                 DetailsScreen { navController.popBackStack() }
             }
             composable(NavItem.Favorites.route) {
-                FavoriteScreen { movieId ->
-                    navController.navigate(NavItem.Details.createRoute(movieId))
-                }
+                FavoriteScreen { onMovieClick }
             }
             composable(NavItem.Planner.route) { RemindersScreen() }
         }
@@ -109,15 +117,22 @@ fun NavigationHost() {
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     NavigationBar {
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
         navItems.forEach { navItem ->
             NavigationBarItem(
                 selected = currentRoute == navItem.route,
                 onClick = {
-                    navController.navigate(navItem.route) {
-                        launchSingleTop = true
-                        restoreState = true
+                    if (currentRoute != navItem.route) {
+                        navController.navigate(navItem.route) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                        }
                     }
                 },
                 label = { Text(navItem.title) },
@@ -127,11 +142,7 @@ fun BottomNavBar(navController: NavHostController) {
     }
 }
 
-@Composable
-fun WatchlistScreen() {
-    Text(text = "Watchlist Screen")
-}
-
+/*
 @Preview(
     showBackground = true,
     apiLevel = 33
@@ -139,4 +150,4 @@ fun WatchlistScreen() {
 @Composable
 fun DefaultPreview() {
     PopcornPlan()
-}
+}*/
