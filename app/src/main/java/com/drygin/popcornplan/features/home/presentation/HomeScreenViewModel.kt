@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.features.home.data.repository.MovieRepositoryImpl
+import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +19,8 @@ class HomeScreenViewModel @Inject constructor(
     private val repository: IMovieRepository
 ) : ViewModel() {
 
-    private val _movies = (repository as MovieRepositoryImpl).getMovies().cachedIn(viewModelScope)
-    val movies: Flow<PagingData<Movie>> = _movies
+    private val _movies = repository.getTrendingMovies().cachedIn(viewModelScope)
+    val movies: Flow<PagingData<TrendingMovie>> = _movies
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {

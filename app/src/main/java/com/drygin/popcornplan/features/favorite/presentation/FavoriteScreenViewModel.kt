@@ -18,13 +18,13 @@ class FavoriteScreenViewModel @Inject constructor(
     val repository: IFavoriteRepository
 ) : ViewModel() {
 
-    private val _movie = MutableStateFlow<List<Movie>>(emptyList())
-    val movie = _movie.asStateFlow()
+    private val _movies = MutableStateFlow<List<Movie>>(emptyList())
+    val movies = _movies.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.getFavoriteMovies().collect {
-                _movie.value = it
+                _movies.value = it
             }
         }
     }

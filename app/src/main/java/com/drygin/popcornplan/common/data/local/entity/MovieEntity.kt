@@ -17,7 +17,5 @@ data class MovieEntity(
     val overview: String,
     val releaseDate: String,
     val rating: Double,
-    val watchers: Int,
-    val favorite: Boolean = false,
-    val pageIndex: Int
+    val favorite: Boolean = false
 )

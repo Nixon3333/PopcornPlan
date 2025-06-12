@@ -1,6 +1,6 @@
 package com.drygin.popcornplan.features.details.data.reposiroty
 
-import com.drygin.popcornplan.common.data.mapper.toDomain
+import com.drygin.popcornplan.common.data.mapper.dto.toDomain
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.details.data.api.MovieDetailsApi
 import com.drygin.popcornplan.features.details.domain.repository.IDetailsRepository

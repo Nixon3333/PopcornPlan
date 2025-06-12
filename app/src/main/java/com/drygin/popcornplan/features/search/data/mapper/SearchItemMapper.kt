@@ -1,6 +1,6 @@
 package com.drygin.popcornplan.features.search.data.mapper
 
-import com.drygin.popcornplan.common.data.mapper.toDomain
+import com.drygin.popcornplan.common.data.mapper.dto.toDomain
 import com.drygin.popcornplan.features.search.data.model.SearchItemDto
 import com.drygin.popcornplan.features.search.domain.model.SearchItem
 

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,13 +29,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.drygin.popcornplan.common.navigation.NavItem
 import com.drygin.popcornplan.common.navigation.NavItem.Companion.navItems
+import com.drygin.popcornplan.common.ui.components.DetailsScreenTopBar
 import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.features.details.presentation.DetailsScreen
+import com.drygin.popcornplan.features.details.presentation.DetailsScreenViewModel
 import com.drygin.popcornplan.features.favorite.presentation.FavoriteScreen
-import com.drygin.popcornplan.features.home.presentation.HomeScreen
+import com.drygin.popcornplan.features.home.presentation.HomeScreenContainer
 import com.drygin.popcornplan.features.home.presentation.HomeScreenViewModel
 import com.drygin.popcornplan.features.reminder.presentation.RemindersScreen
 import com.drygin.popcornplan.features.search.presentation.SearchScreen
+import com.drygin.popcornplan.preview.PreviewMocks
+import com.drygin.popcornplan.preview.home.HomeScreenPreview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,8 +49,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // TODO: Перенести в reminder
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
             }
         }
         setContent {
@@ -76,8 +89,18 @@ fun ApplyStatusBarColor() {
 @Composable
 fun NavigationHost() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
-        bottomBar = { BottomNavBar(navController) }
+        topBar = {
+            DetailsTopBarIfNeeded(navController, currentRoute)
+        },
+        bottomBar = {
+            if (currentRoute?.startsWith("details/") != true) {
+                BottomNavBar(navController, currentRoute)
+            }
+        }
     ) { paddingValues ->
         NavHost(
             navController = navController,
@@ -95,8 +118,11 @@ fun NavigationHost() {
                     homeScreenViewModel.onToggleFavorite(movieId)
                 }
 
-                HomeScreen(homeScreenViewModel, onMovieClick = onMovieClick,
-                    onToggleFavorite = onToggleFavorite)
+                HomeScreenContainer(
+                    homeScreenViewModel,
+                    onMovieClick = onMovieClick,
+                    onToggleFavorite = onToggleFavorite
+                )
             }
             composable(NavItem.Search.route) {
                 SearchScreen { onMovieClick }
@@ -104,8 +130,9 @@ fun NavigationHost() {
             composable(
                 NavItem.Details.route,
                 arguments = listOf(navArgument("movieId") { type = NavType.IntType })
-            ) {
-                DetailsScreen { navController.popBackStack() }
+            ) { navBackStackEntry ->
+                val viewModel: DetailsScreenViewModel = hiltViewModel(navBackStackEntry)
+                DetailsScreen(viewModel)
             }
             composable(NavItem.Favorites.route) {
                 FavoriteScreen { onMovieClick }
@@ -116,10 +143,10 @@ fun NavigationHost() {
 }
 
 @Composable
-fun BottomNavBar(navController: NavHostController) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
+fun BottomNavBar(
+    navController: NavHostController,
+    currentRoute: String?
+) {
     NavigationBar {
         navItems.forEach { navItem ->
             NavigationBarItem(
@@ -142,12 +169,29 @@ fun BottomNavBar(navController: NavHostController) {
     }
 }
 
-/*
+@Composable
+fun DetailsTopBarIfNeeded(
+    navController: NavHostController,
+    currentRoute: String?
+) {
+    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+    val movieId = currentBackStackEntry?.arguments?.getInt("movieId")
+
+    if (currentRoute?.startsWith("details/") == true && movieId != null) {
+        val viewModel: DetailsScreenViewModel = hiltViewModel(currentBackStackEntry)
+        DetailsScreenTopBar(viewModel) { navController.popBackStack() }
+    }
+}
+
 @Preview(
     showBackground = true,
     apiLevel = 33
 )
 @Composable
 fun DefaultPreview() {
-    PopcornPlan()
-}*/
+    HomeScreenPreview(
+        movies = PreviewMocks.sampleMovies,
+        {},
+        {}
+    )
+}

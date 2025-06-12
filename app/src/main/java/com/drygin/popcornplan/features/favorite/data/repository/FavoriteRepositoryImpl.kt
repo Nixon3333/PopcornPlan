@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.features.favorite.data.repository
 
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
-import com.drygin.popcornplan.common.data.mapper.toDomain
+import com.drygin.popcornplan.common.data.mapper.entity.toDomain
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.favorite.domain.repository.IFavoriteRepository
 import kotlinx.coroutines.Dispatchers

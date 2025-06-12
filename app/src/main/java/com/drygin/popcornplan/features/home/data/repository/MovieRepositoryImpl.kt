@@ -9,13 +9,12 @@ import androidx.paging.map
 import com.drygin.popcornplan.common.data.local.dao.ImageDao
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.local.dao.TrendingDao
-import com.drygin.popcornplan.common.data.local.entity.MovieWithImages
-import com.drygin.popcornplan.common.data.local.entity.TrendingMovieEntity
-import com.drygin.popcornplan.common.data.mapper.toDomain
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.data.local.relation.TrendingMovieWithImages
 import com.drygin.popcornplan.common.utils.TransactionRunner
 import com.drygin.popcornplan.features.home.data.api.MovieApi
+import com.drygin.popcornplan.features.home.data.mapper.toDomain
 import com.drygin.popcornplan.features.home.data.paging.TrendingMoviesRemoteMediator
+import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -34,13 +33,12 @@ class MovieRepositoryImpl @Inject constructor(
     private val transactionRunner: TransactionRunner
 ) : IMovieRepository {
 
-    private var pagingSource: PagingSource<Int, MovieWithImages>? = null
+    private var pagingSource: PagingSource<Int, TrendingMovieWithImages>? = null
 
     @OptIn(ExperimentalPagingApi::class)
-    fun getMovies(): Flow<PagingData<Movie>> {
+    override fun getTrendingMovies(): Flow<PagingData<TrendingMovie>> {
         val pagingSourceFactory = {
-            //val source = trendingMovieDao.getTrendingMovies()
-            val source = movieDao.getPagedMovies()
+            val source = trendingMovieDao.getTrendingMovies()
             pagingSource = source
             source
         }
@@ -68,7 +66,7 @@ class MovieRepositoryImpl @Inject constructor(
     override suspend fun updateFavorite(movieId: Int) {
         withContext(Dispatchers.IO) {
             movieDao.getMovie(movieId)?.let {
-                movieDao.insertAll(listOf(it.copy(favorite = !it.favorite)))
+                movieDao.update(it.copy(favorite = !it.favorite))
             }
         }
     }
