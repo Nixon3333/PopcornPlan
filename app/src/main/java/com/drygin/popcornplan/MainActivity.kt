@@ -1,10 +1,12 @@
 package com.drygin.popcornplan
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,18 +18,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -55,6 +62,7 @@ import com.drygin.popcornplan.preview.PreviewMocks
 import com.drygin.popcornplan.preview.home.HomeScreenPreview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -94,10 +102,14 @@ fun ApplyStatusBarColor() {
     val background = MaterialTheme.colorScheme.background
     val surface = MaterialTheme.colorScheme.surface
 
+    val useDarkIconsForStatusBar = background.luminance() > 0.5f
+    val useDarkIconsForNavBar = surface.luminance() > 0.5f
+
+
     SideEffect {
         systemUiController.setStatusBarColor(
             color = background,
-            darkIcons = false
+            darkIcons = useDarkIconsForStatusBar
         )
     }
 
@@ -105,7 +117,7 @@ fun ApplyStatusBarColor() {
     SideEffect {
         systemUiController.setNavigationBarColor(
             color = surface,
-            darkIcons = false
+            darkIcons = useDarkIconsForNavBar
         )
     }
 }
@@ -116,14 +128,32 @@ fun NavigationHost() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var backPressedTime by remember { mutableLongStateOf(0L) }
+    val context = LocalContext.current
 
     var showAddReminderDialog by remember { mutableStateOf(false) }
 
+    BackHandler {
+        if (navController.previousBackStackEntry != null) {
+            navController.popBackStack()
+        } else {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - backPressedTime < 2000) {
+                (context as Activity).moveTaskToBack(true)
+            } else {
+                backPressedTime = currentTime
+                scope.launch { snackbarHostState.showSnackbar("Нажмите ещё раз, чтобы выйти") }
+            }
+        }
+    }
+
     Surface(
-        color = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 when (currentRoute) {
                     NavItem.Planner.route -> TopAppBar(title = { Text("Планы") })
@@ -206,11 +236,6 @@ fun BottomNavBar(
     navController: NavHostController,
     currentRoute: String?
 ) {
-    NavItem.navItems.forEachIndexed { index, navItem ->
-        println("QWEQWE $index = ${navItem?.title}")
-    }
-
-
     NavigationBar {
         NavItem.navItems.forEach { navItem ->
             NavigationBarItem(
@@ -227,14 +252,7 @@ fun BottomNavBar(
                     }
                 },
                 label = { Text(navItem.title) },
-                icon = { Icon(navItem.icon, contentDescription = navItem.title) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer
-                )
+                icon = { Icon(navItem.icon, contentDescription = navItem.title) }
             )
         }
     }
@@ -259,9 +277,7 @@ fun RemindersFAB(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { onClick() },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        onClick = { onClick() }
     ) {
         Icon(Icons.Default.Add, contentDescription = "Добавить")
     }

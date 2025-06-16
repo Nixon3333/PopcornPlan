@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.drygin.popcornplan.common.ui.components.MovieCard
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
@@ -52,13 +51,13 @@ fun TrendingCard(
             Icon(
                 imageVector = Icons.Filled.Face,
                 contentDescription = "Watching count",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = trendingMovie.watchers.toString(),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall
             )
         }

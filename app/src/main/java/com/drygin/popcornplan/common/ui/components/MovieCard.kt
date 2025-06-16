@@ -1,7 +1,6 @@
 package com.drygin.popcornplan.common.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -63,7 +62,6 @@ fun MovieCard(
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
