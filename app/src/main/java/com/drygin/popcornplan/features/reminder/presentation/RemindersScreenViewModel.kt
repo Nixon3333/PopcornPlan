@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.features.favorite.domain.repository.IFavoriteRepository
 import com.drygin.popcornplan.features.reminder.ReminderWorker
 import com.drygin.popcornplan.features.reminder.domain.model.Reminder
 import com.drygin.popcornplan.features.reminder.domain.repository.IReminderRepository
@@ -14,6 +16,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -23,23 +28,49 @@ import javax.inject.Inject
 @HiltViewModel
 class RemindersScreenViewModel @Inject constructor(
     private val reminderRepository: IReminderRepository,
+    private val favoriteRepository: IFavoriteRepository,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _reminders = MutableStateFlow<List<Reminder>>(emptyList())
     val reminders = _reminders.asStateFlow()
 
+    private val _movies = MutableStateFlow<List<Movie>>(emptyList())
+    val movies = _movies.asStateFlow()
+
     init {
         viewModelScope.launch {
-            reminderRepository.getAll()
-                .collect { reminderList ->
-                    _reminders.value = reminderList
+            launch {
+                reminderRepository.getAll()
+                    .collect { reminderList ->
+                        _reminders.value = reminderList
+                    }
+            }
+            launch {
+                favoriteRepository.getFavoriteMovies().collect {
+                    _movies.value = it
                 }
+            }
         }
     }
 
-    fun addReminder(reminder: Reminder) {
+    fun createReminder(movie: Movie, reminderTime: LocalDateTime, description: String) : Reminder {
+        return Reminder(
+            id = UUID.randomUUID().toString(),
+            traktId = movie.ids.trakt,
+            title = movie.title,
+            type = "movie",
+            description = description,
+            posterUrl = movie.images.poster.firstOrNull(),
+            reminderTime = reminderTime.atZone(ZoneId.systemDefault()).toInstant()
+                .toEpochMilli(),
+            createdAt = System.currentTimeMillis()
+        )
+    }
+
+    fun addReminder(movie: Movie, reminderTime: LocalDateTime, description: String) {
         viewModelScope.launch {
+            val reminder = createReminder(movie, reminderTime, description)
             reminderRepository.addReminder(reminder)
             scheduleReminder(appContext, reminder)
         }
@@ -62,7 +93,7 @@ class RemindersScreenViewModel @Inject constructor(
                 workDataOf(
                     "reminderId" to reminder.id,
                     "title" to reminder.title,
-                    "tmdbId" to reminder.tmdbId,
+                    "tmdbId" to reminder.traktId,
                     "type" to reminder.type
                 )
             )

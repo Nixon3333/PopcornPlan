@@ -44,4 +44,10 @@ class SearchScreenViewModel @Inject constructor(
     fun onQueryChanged(newQuery: String) {
         _query.value = newQuery
     }
+
+    fun onToggleFavorite(movieId: Int) {
+        viewModelScope.launch {
+            repository.onToggleFavorite(movieId)
+        }
+    }
 }

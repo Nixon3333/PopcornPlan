@@ -2,28 +2,23 @@ package com.drygin.popcornplan.common.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,59 +55,72 @@ fun MovieCard(
             .build()
     }
     val painter = rememberAsyncImagePainter(imageRequest)
-    Column(
-        modifier = Modifier
-            .width(Dimens.MovieCardWidth)
-            .clickable(onClick = onClick)
+    Surface(
+        tonalElevation = 2.dp,
+        shape = RoundedCornerShape(Dimens.MovieCardCornerRadius),
+        onClick = onClick,
+        modifier = Modifier.width(Dimens.MovieCardWidth)
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .height(Dimens.MovieCardHeight)
-                .width(Dimens.MovieCardHeight)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
-            Image(
-                painter = painter,
-                contentDescription = movie.title,
+            Box(
                 modifier = Modifier
                     .height(Dimens.MovieCardHeight)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius)),
-                contentScale = ContentScale.Crop
-            )
-
-            // Кнопка избранного
-            IconButton(
-                onClick = { onToggleFavorite() },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(8.dp)
-                    .background(
-                        color = Color.Black.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
             ) {
-                Icon(
-                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = if (movie.isFavorite) "Убрать из избранного" else "Добавить в избранное",
-                    tint = if (movie.isFavorite) Color.Red else Color.White
+                Image(
+                    painter = painter,
+                    contentDescription = movie.title,
+                    modifier = Modifier
+                        .height(Dimens.MovieCardHeight)
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = Dimens.MovieCardCornerRadius,
+                                topEnd = Dimens.MovieCardCornerRadius
+                            )
+                        ),
+                    contentScale = ContentScale.Crop
+                )
+                FavoriteButton(
+                    movie.isFavorite,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .size(Dimens.FavoriteButtonSize)
+                ) {
+                    onToggleFavorite()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Dimens.VerticalItemSpacing))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = movie.title,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = movie.year.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(Dimens.VerticalItemSpacing))
-
-        Text(
-            text = movie.title,
-            color = Color.White,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Text(
-            text = movie.year.toString(),
-            color = Color.Gray,
-            style = MaterialTheme.typography.labelSmall
-        )
     }
 }

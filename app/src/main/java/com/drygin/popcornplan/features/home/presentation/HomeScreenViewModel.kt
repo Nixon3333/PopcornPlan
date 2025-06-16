@@ -24,7 +24,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            repository.updateFavorite(movieId)
+            repository.onToggleFavorite(movieId)
         }
     }
 }

@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ISearchRepository {
     suspend fun searchMovie(query: String): Flow<Result<List<SearchItem>>>
+    suspend fun onToggleFavorite(movieId: Int)
 }

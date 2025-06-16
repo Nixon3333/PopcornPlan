@@ -1,14 +1,17 @@
 package com.drygin.popcornplan.features.reminder.domain.model
 
+import java.util.UUID
+
 /**
  * Created by Drygin Nikita on 04.06.2025.
  */
 data class Reminder(
-    val id: String,
-    val tmdbId: Int,
+    val id: String = UUID.randomUUID().toString(),
+    val traktId: Int,
     val title: String,
     val type: String,
-    val reminderTime: Long, // millis (System.currentTimeMillis() + offset)
+    val description: String = "",
+    val reminderTime: Long,
     val posterUrl: String?,
-    val createdAt: Long
+    val createdAt: Long = System.currentTimeMillis()
 )

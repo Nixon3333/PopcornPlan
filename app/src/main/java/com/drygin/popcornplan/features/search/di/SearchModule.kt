@@ -1,5 +1,6 @@
 package com.drygin.popcornplan.features.search.di
 
+import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.features.search.data.api.SearchApi
 import com.drygin.popcornplan.features.search.data.repository.SearchRepositoryImpl
 import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
@@ -25,8 +26,9 @@ object SearchModule {
     @Provides
     @Singleton
     fun provideSearchRepository(
-        api: SearchApi
+        api: SearchApi,
+        movieDao: MovieDao
     ) : ISearchRepository {
-        return SearchRepositoryImpl(api)
+        return SearchRepositoryImpl(api, movieDao)
     }
 }

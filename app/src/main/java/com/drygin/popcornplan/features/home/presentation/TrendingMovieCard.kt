@@ -43,7 +43,7 @@ fun TrendingCard(
                 .align(Alignment.TopEnd)
                 .padding(8.dp)
                 .background(
-                    color = Color.Black.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(horizontal = 8.dp, vertical = 4.dp),

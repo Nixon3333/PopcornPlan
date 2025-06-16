@@ -63,7 +63,7 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateFavorite(movieId: Int) {
+    override suspend fun onToggleFavorite(movieId: Int) {
         withContext(Dispatchers.IO) {
             movieDao.getMovie(movieId)?.let {
                 movieDao.update(it.copy(favorite = !it.favorite))

@@ -20,4 +20,7 @@ object Dimens {
     val MovieCardWidth = 120.dp
     val MovieCardHeight = 180.dp
     val MovieCardCornerRadius = 8.dp
+
+    val FavoriteButtonSize = 36.dp
+    val FavoriteButtonPadding = 8.dp
 }

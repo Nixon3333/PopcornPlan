@@ -29,9 +29,9 @@ class FavoriteScreenViewModel @Inject constructor(
         }
     }
 
-    fun removeFavorite(movieId: Int) {
+    fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            repository.removeFavorite(movieId)
+            repository.onToggleFavorite(movieId)
         }
     }
 }

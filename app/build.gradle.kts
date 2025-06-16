@@ -105,14 +105,14 @@ dependencies {
     // Room
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+    implementation(libs.room.paging)
 
     // WorkManager
     implementation(libs.androidx.work)
 
     // Paging 3
-    implementation("androidx.paging:paging-runtime:3.3.6")
-    implementation("androidx.paging:paging-compose:3.3.6")
-    implementation("androidx.room:room-paging:2.6.1")
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

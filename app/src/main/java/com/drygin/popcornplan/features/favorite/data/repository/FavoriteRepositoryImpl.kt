@@ -24,10 +24,10 @@ class FavoriteRepositoryImpl @Inject constructor(
                     .map { it.toDomain() }
             }
 
-    override suspend fun removeFavorite(movieId: Int) {
+    override suspend fun onToggleFavorite(movieId: Int) {
         withContext(Dispatchers.IO) {
             dao.getMovie(movieId)?.let {
-                dao.insertAll(listOf(it.copy(favorite = false)))
+                dao.insertAll(listOf(it.copy(favorite = !it.favorite)))
             }
         }
     }

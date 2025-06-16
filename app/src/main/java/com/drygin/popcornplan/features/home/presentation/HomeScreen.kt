@@ -1,11 +1,9 @@
 package com.drygin.popcornplan.features.home.presentation
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,13 +21,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.drygin.popcornplan.R
-import com.drygin.popcornplan.common.ui.theme.BackgroundColor
 import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 
@@ -79,16 +75,15 @@ fun HomeScreen(
         isRefreshing = isRefreshing,
         onRefresh = { movies.refresh() },
         modifier = Modifier
-            .background(BackgroundColor)
             .padding(vertical = Dimens.VerticalListSpacing)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
             item {
                 SectionTitle(
                     title = stringResource(id = R.string.trending),
-                    onShowAllClick = { /* TODO */ }
+                    onShowAllClick = { /* TODO */ },
                 )
             }
             item {
@@ -114,11 +109,11 @@ fun SectionTitle(title: String, onShowAllClick: () -> Unit) {
     ) {
         Text(
             text = title,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.titleLarge
         )
         TextButton(onClick = onShowAllClick) {
-            Text(text = stringResource(R.string.show_all), color = Color.Cyan)
+            Text(text = stringResource(R.string.show_all))
         }
     }
 }

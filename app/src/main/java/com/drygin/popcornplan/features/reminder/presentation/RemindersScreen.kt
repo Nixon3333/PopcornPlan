@@ -1,6 +1,8 @@
 package com.drygin.popcornplan.features.reminder.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,22 +10,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,52 +29,86 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.ui.components.DateTimePicker
+import com.drygin.popcornplan.common.ui.components.ExposedDropdown
+import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.features.reminder.domain.model.Reminder
+import com.drygin.popcornplan.preview.PreviewMocks
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 /**
  * Created by Drygin Nikita on 04.06.2025.
  */
+@Preview
+@Composable
+fun PreviewRemindersScreen() {
+    PopcornPlanTheme(darkTheme = true) {
+        RemindersScreen(
+            PreviewMocks.sampleReminders,
+            PreviewMocks.sampleMovies,
+            { _, _, _ -> }, {}, false
+        ) { }
+    }
+}
+
+val dateTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+
+@Composable
+fun RemindersScreenContainer(
+    viewModel: RemindersScreenViewModel = hiltViewModel(),
+    showAddDialog: Boolean,
+    onDismissDialog: () -> Unit
+) {
+
+    val reminders by viewModel.reminders.collectAsState()
+    val movies by viewModel.movies.collectAsState()
+
+    RemindersScreen(
+        reminders,
+        movies,
+        addReminder = viewModel::addReminder,
+        deleteReminder = viewModel::deleteReminder,
+        showAddDialog = showAddDialog,
+        onDismissDialog = onDismissDialog
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemindersScreen(
-    viewModel: RemindersScreenViewModel = hiltViewModel()
+    reminders: List<Reminder>,
+    movies: List<Movie>,
+    addReminder: (Movie, LocalDateTime, String) -> Unit,
+    deleteReminder: (Reminder) -> Unit,
+    showAddDialog: Boolean,
+    onDismissDialog: () -> Unit
 ) {
-    val reminders by viewModel.reminders.collectAsState()
-    var showAddDialog by remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Планы") })
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Добавить")
-            }
-        }
-    ) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding)) {
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(reminders) { reminder ->
                 ReminderItem(
                     reminder = reminder,
-                    onDelete = { viewModel.deleteReminder(reminder) }
+                    onDelete = { deleteReminder(reminder) }
                 )
             }
         }
 
         if (showAddDialog) {
             AddReminderDialog(
-                onDismiss = { showAddDialog = false },
-                onAdd = { reminder ->
-                    viewModel.addReminder(reminder)
-                    showAddDialog = false
-                }
+                movies = movies,
+                addReminder = addReminder,
+                onDismiss = onDismissDialog
             )
         }
     }
@@ -87,22 +119,19 @@ fun ReminderItem(
     reminder: Reminder,
     onDelete: () -> Unit
 ) {
-    val formatter = remember {
-        DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-    }
-
     val formattedTime = remember(reminder.reminderTime) {
         LocalDateTime.ofInstant(
             Instant.ofEpochMilli(reminder.reminderTime),
             ZoneId.systemDefault()
-        ).format(formatter)
+        ).format(dateTimeFormatter)
     }
 
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation()
+        elevation = CardDefaults.cardElevation(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
@@ -124,34 +153,43 @@ fun ReminderItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddReminderDialog(
-    onDismiss: () -> Unit,
-    onAdd: (Reminder) -> Unit
+    movies: List<Movie>,
+    addReminder: (Movie, LocalDateTime, String) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+    var description by remember { mutableStateOf("") }
+    var dateTime by remember { mutableStateOf(LocalDateTime.now()) }
+
+    var showPicker by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(onClick = {
-                val reminderTime = LocalDateTime.now()
-                    .plusMinutes(1) // Заглушка: напоминание через 1 минуту
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli()
-
-                val reminder = Reminder(
-                    id = UUID.randomUUID().toString(),
-                    title = title,
-                    reminderTime = reminderTime,
-                    createdAt = System.currentTimeMillis(),
-                    type = "",
-                    tmdbId = 10,
-                    posterUrl = ""
-                )
-                onAdd(reminder)
-            }) {
+            TextButton(
+                onClick = {
+                    selectedMovie?.let {
+                        /*val reminder = Reminder(
+                            id = UUID.randomUUID().toString(),
+                            traktId = it.ids.trakt,
+                            title = it.title,
+                            type = "movie",
+                            description = description,
+                            posterUrl = it.images.poster.firstOrNull(),
+                            reminderTime = dateTime.atZone(ZoneId.systemDefault()).toInstant()
+                                .toEpochMilli(),
+                            createdAt = System.currentTimeMillis()
+                        )
+                        onAdd(reminder)*/
+                        addReminder(it, dateTime, description)
+                        onDismiss()
+                    }
+                },
+                enabled = selectedMovie != null
+            ) {
                 Text("Добавить")
             }
         },
@@ -162,11 +200,51 @@ fun AddReminderDialog(
         },
         title = { Text("Новое напоминание") },
         text = {
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Описание") }
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ExposedDropdown(
+                    items = movies,
+                    selectedItem = selectedMovie,
+                    onItemSelected = { selectedMovie = it },
+                    itemLabel = { it.title },
+                    label = "Фильм"
+                )
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Описание (необязательно)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(onClick = { showPicker = true }) {
+                    Text("Выбрать дату: ${dateTime.format(dateTimeFormatter)}")
+                }
+            }
         }
     )
+
+    if (showPicker)
+        DateTimePicker(
+            initialDateTime = dateTime ?: LocalDateTime.now(),
+            onDateTimeSelected = {
+                dateTime = it
+                showPicker = false
+            },
+            onDismissRequest = {
+                showPicker = false
+            }
+        )
 }
+
+/*
+val reminder = Reminder(
+    id = UUID.randomUUID().toString(),
+    title = title,
+    reminderTime = reminderTime,
+    createdAt = System.currentTimeMillis(),
+    type = "",
+    tmdbId = 10,
+    posterUrl = ""
+)*/
