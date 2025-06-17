@@ -285,7 +285,7 @@ fun RemindersFAB(
 
 @Preview(
     showBackground = true,
-    apiLevel = 33
+    apiLevel = 34
 )
 @Composable
 fun DefaultPreview() {

@@ -8,3 +8,4 @@ import com.drygin.popcornplan.features.search.domain.model.SearchItem
  * Created by Drygin Nikita on 28.05.2025.
  */
 fun SearchItemDto.toDomain() = SearchItem(type, score, movie.toDomain())
+fun SearchItemDto.toMovieDomain() = movie.toDomain()

@@ -2,6 +2,7 @@ package com.drygin.popcornplan.features.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.UiState
 import com.drygin.popcornplan.common.utils.collectToUiState
 import com.drygin.popcornplan.features.search.domain.model.SearchItem
@@ -24,7 +25,7 @@ class SearchScreenViewModel @Inject constructor(
     private val repository: ISearchRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiState<List<SearchItem>>>(UiState.Loading)
+    private val _uiState = MutableStateFlow<UiState<List<Movie>>>(UiState.Loading)
     val uiState = _uiState.asStateFlow()
 
     private val _query = MutableStateFlow("")
