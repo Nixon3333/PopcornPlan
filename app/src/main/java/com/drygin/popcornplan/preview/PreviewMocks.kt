@@ -85,6 +85,5 @@ object PreviewMocks {
 
     fun <T : Any> List<T>.toPagingData(): PagingData<T> = PagingData.from(this)
 
-    // Мок Flow для превью
     val mockedMoviesFlow: Flow<PagingData<TrendingMovie>> = flowOf(sampleTrendingMovies.toPagingData())
 }

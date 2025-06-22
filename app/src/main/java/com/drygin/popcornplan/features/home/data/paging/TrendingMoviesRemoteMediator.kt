@@ -8,6 +8,7 @@ import com.drygin.popcornplan.common.data.local.dao.ImageDao
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.local.dao.TrendingDao
 import com.drygin.popcornplan.common.data.local.relation.TrendingMovieWithImages
+import com.drygin.popcornplan.common.data.local.utils.saveMoviesPreservingFavorites
 import com.drygin.popcornplan.common.data.mapper.toEntities
 import com.drygin.popcornplan.common.data.mapper.toEntity
 import com.drygin.popcornplan.features.home.data.api.MovieApi
@@ -52,14 +53,9 @@ class TrendingMoviesRemoteMediator(
                     trendingMovieDao.clearAll()
                 }
 
-                val existingMovies = movieDao.getMoviesByIds(response.map { it.movie.ids.trakt })
+                val entities = moviesDto.map { it.toEntity() }
+                movieDao.saveMoviesPreservingFavorites(entities)
 
-                val mergedMovies = moviesDto.map { newMovie ->
-                    val oldMovie = existingMovies.find { it.traktId == newMovie.ids.trakt }
-                    newMovie.toEntity().copy(favorite = oldMovie?.favorite == true)
-                }
-
-                movieDao.insertAll(mergedMovies)
                 trendingMovieDao.insertAll(trendingMovies.map { it.toEntity(page) })
 
                 response.forEach { movieDto ->

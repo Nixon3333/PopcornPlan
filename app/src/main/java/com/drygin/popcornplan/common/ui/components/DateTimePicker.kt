@@ -2,13 +2,10 @@ package com.drygin.popcornplan.common.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -16,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.DialogProperties
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -70,19 +68,9 @@ fun DateTimePicker(
             },
             title = { Text("Выберите дату") },
             text = {
-                DatePicker(
-                    state = datePickerState,
-                    colors = DatePickerDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        dayContentColor = MaterialTheme.colorScheme.onSurface,
-                        selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
-                        todayContentColor = MaterialTheme.colorScheme.primary,
-                        todayDateBorderColor = MaterialTheme.colorScheme.primary
-                    )
-                )
+                DatePicker(state = datePickerState)
             },
-            containerColor = MaterialTheme.colorScheme.surface
+            properties = DialogProperties(usePlatformDefaultWidth = false)
         )
     }
 
@@ -117,26 +105,8 @@ fun DateTimePicker(
             },
             title = { Text("Выберите время") },
             text = {
-                TimePicker(
-                    state = timePickerState,
-                    colors = TimePickerDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        selectorColor = MaterialTheme.colorScheme.primary,
-                        clockDialColor = MaterialTheme.colorScheme.surfaceVariant,
-                        clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surface,
-                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface,
-                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surface,
-                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.surface
+                TimePicker(state = timePickerState)
+            }
         )
     }
 }

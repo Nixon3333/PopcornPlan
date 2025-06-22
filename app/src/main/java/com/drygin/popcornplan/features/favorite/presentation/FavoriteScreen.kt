@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
@@ -24,13 +25,16 @@ import com.drygin.popcornplan.preview.PreviewMocks
  */
 @Composable
 fun FavoriteScreenContainer(
-    viewModel: FavoriteScreenViewModel,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    viewModel: FavoriteScreenViewModel = hiltViewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val movies by viewModel.movies.collectAsState()
 
-    FavoriteScreen(movies, onMovieClick, onToggleFavorite)
+    FavoriteScreen(
+        movies,
+        onMovieClick,
+        viewModel::onToggleFavorite
+    )
 }
 
 @Composable

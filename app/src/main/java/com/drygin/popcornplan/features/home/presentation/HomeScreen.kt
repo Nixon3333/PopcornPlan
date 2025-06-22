@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +18,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -35,15 +39,14 @@ import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
  */
 @Composable
 fun HomeScreenContainer(
-    viewModel: HomeScreenViewModel,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val movies = viewModel.movies.collectAsLazyPagingItems()
     HomeScreen(
         movies,
         onMovieClick,
-        onToggleFavorite
+        viewModel::onToggleFavorite
     )
 }
 
@@ -64,12 +67,12 @@ fun HomeScreen(
 
     val horizontalListState = rememberLazyListState()
 
-    LaunchedEffect(movies.loadState.refresh) {
+    /*LaunchedEffect(movies.itemSnapshotList) {
         val refreshState = movies.loadState.refresh
         if (refreshState is LoadState.NotLoading) {
             horizontalListState.animateScrollToItem(0)
         }
-    }
+    }*/
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -125,6 +128,41 @@ fun HorizontalPagingMovieList(
     onMovieClick: (Int) -> Unit,
     onToggleFavorite: (Int) -> Unit
 ) {
+    val loadedMovies by remember {
+        derivedStateOf {
+            (0 until movies.itemCount).mapNotNull { index ->
+                val movie = movies.peek(index)
+                movie?.let { index to it }
+            }
+        }
+    }
+
+    LazyRow(
+        state = listState,
+        contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing)
+    ) {
+        items(
+            items = loadedMovies,
+            key = { (_, movie) -> movie.movie.ids.trakt }
+        ) { (_, movie) ->
+            TrendingCard(
+                trendingMovie = movie,
+                onClick = { onMovieClick(movie.movie.ids.trakt) },
+                onToggleFavorite = { onToggleFavorite(movie.movie.ids.trakt) }
+            )
+        }
+    }
+}
+
+
+/*@Composable
+fun HorizontalPagingMovieList(
+    movies: LazyPagingItems<TrendingMovie>,
+    listState: LazyListState,
+    onMovieClick: (Int) -> Unit,
+    onToggleFavorite: (Int) -> Unit
+) {
     LazyRow(
         state = listState,
         contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
@@ -142,4 +180,4 @@ fun HorizontalPagingMovieList(
             }
         }
     }
-}
+}*/

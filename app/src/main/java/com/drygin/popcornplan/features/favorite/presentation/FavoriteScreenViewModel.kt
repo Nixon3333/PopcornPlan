@@ -3,7 +3,7 @@ package com.drygin.popcornplan.features.favorite.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.features.favorite.domain.repository.IFavoriteRepository
+import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

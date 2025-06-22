@@ -32,11 +32,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.drygin.popcornplan.R
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.theme.Dimens
 
@@ -69,7 +66,6 @@ fun MovieList(
                     movie,
                     onMovieClick = { onMovieClick(movie.ids.trakt) },
                     onToggleFavorite = {
-                        visible = false
                         onToggleFavorite(movie.ids.trakt)
                     }
                 )
@@ -100,15 +96,13 @@ fun MovieItem(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                    AsyncImage(
-                        model = "https://${movie.images.poster.firstOrNull()}",
-                        contentDescription = movie.title,
-                        placeholder = painterResource(R.drawable.ic_launcher_foreground),
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius))
-                    )
-
+                ShimmerAsyncImage(
+                    model = "https://${movie.images.poster.firstOrNull()}",
+                    movie.title,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius))
+                )
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Surface(

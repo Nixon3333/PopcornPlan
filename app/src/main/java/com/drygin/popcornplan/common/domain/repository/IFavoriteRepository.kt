@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.features.favorite.domain.repository
+package com.drygin.popcornplan.common.domain.repository
 
 import com.drygin.popcornplan.common.domain.model.Movie
 import kotlinx.coroutines.flow.Flow

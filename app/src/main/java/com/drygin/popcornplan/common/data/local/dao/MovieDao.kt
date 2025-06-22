@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.drygin.popcornplan.common.data.local.entity.MovieEntity
 import com.drygin.popcornplan.common.data.local.relation.MovieWithImages
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,10 @@ interface MovieDao {
     fun movies(): Flow<List<MovieWithImages>>
 
     @Query("SELECT * FROM movies WHERE traktId IN (:ids)")
-    fun getMoviesByIds(ids: List<Int>): List<MovieEntity>
+    suspend fun getMoviesByIds(ids: List<Int>): List<MovieWithImages>
+
+    @Query("SELECT * FROM movies WHERE traktId IN (:ids)")
+    fun getMoviesByIdsFlow(ids: List<Int>): Flow<List<MovieWithImages>>
 
     @Update
     suspend fun update(movie: MovieEntity)
@@ -31,8 +35,15 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE traktId =:traktId")
     fun movieWithImages(traktId: Int): MovieWithImages?
 
+    @Transaction
+    @Query("SELECT * FROM movies WHERE traktId =:traktId")
+    fun observeMovieWithImages(traktId: Int): Flow<MovieWithImages?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(movies: List<MovieEntity>)
+
+    @Upsert
+    suspend fun upsert(movie: MovieEntity)
 
     @Query("delete from movies")
     suspend fun clearAll()

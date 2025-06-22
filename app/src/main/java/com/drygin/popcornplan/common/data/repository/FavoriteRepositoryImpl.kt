@@ -1,9 +1,9 @@
-package com.drygin.popcornplan.features.favorite.data.repository
+package com.drygin.popcornplan.common.data.repository
 
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.mapper.entity.toDomain
 import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.features.favorite.domain.repository.IFavoriteRepository
+import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -14,10 +14,10 @@ import javax.inject.Inject
  * Created by Drygin Nikita on 02.06.2025.
  */
 class FavoriteRepositoryImpl @Inject constructor(
-    val dao: MovieDao
+    private val movieDao: MovieDao,
 ) : IFavoriteRepository {
     override suspend fun getFavoriteMovies(): Flow<List<Movie>> =
-        dao.movies()
+        movieDao.movies()
             .map { entities ->
                 entities
                     .filter { it.movieEntity.favorite }
@@ -26,8 +26,9 @@ class FavoriteRepositoryImpl @Inject constructor(
 
     override suspend fun onToggleFavorite(movieId: Int) {
         withContext(Dispatchers.IO) {
-            dao.getMovie(movieId)?.let {
-                dao.insertAll(listOf(it.copy(favorite = !it.favorite)))
+            val localMovie = movieDao.getMovie(movieId)
+            localMovie?.let {
+                movieDao.upsert(it.copy(favorite = !it.favorite))
             }
         }
     }

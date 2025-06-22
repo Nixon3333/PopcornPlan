@@ -8,6 +8,5 @@ import kotlinx.coroutines.flow.Flow
  * Created by Drygin Nikita on 23.05.2025.
  */
 interface IMovieRepository {
-    suspend fun onToggleFavorite(movieId: Int)
     fun getTrendingMovies(): Flow<PagingData<TrendingMovie>>
 }

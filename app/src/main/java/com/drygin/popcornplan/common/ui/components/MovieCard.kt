@@ -1,6 +1,5 @@
 package com.drygin.popcornplan.common.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,15 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import com.drygin.popcornplan.R
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.theme.Dimens
 
@@ -38,22 +30,10 @@ fun MovieCard(
     onToggleFavorite: () -> Unit,
     onClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    val posterUrl = remember(movie.images.poster) {
+    val posterUrl = remember(movie.ids.trakt) {
         "https://" + movie.images.poster.firstOrNull().orEmpty()
     }
 
-    val imageRequest = remember(posterUrl) {
-        ImageRequest.Builder(context)
-            .data(posterUrl)
-            .crossfade(true)
-            .placeholder(R.drawable.ic_launcher_background)
-            .error(R.drawable.ic_launcher_foreground)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .build()
-    }
-    val painter = rememberAsyncImagePainter(imageRequest)
     Surface(
         tonalElevation = 2.dp,
         shape = RoundedCornerShape(Dimens.MovieCardCornerRadius),
@@ -68,19 +48,12 @@ fun MovieCard(
                     .height(Dimens.MovieCardHeight)
                     .fillMaxWidth()
             ) {
-                Image(
-                    painter = painter,
+                ShimmerAsyncImage(
+                    model = posterUrl,
                     contentDescription = movie.title,
                     modifier = Modifier
                         .height(Dimens.MovieCardHeight)
                         .fillMaxWidth()
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = Dimens.MovieCardCornerRadius,
-                                topEnd = Dimens.MovieCardCornerRadius
-                            )
-                        ),
-                    contentScale = ContentScale.Crop
                 )
                 FavoriteButton(
                     movie.isFavorite,

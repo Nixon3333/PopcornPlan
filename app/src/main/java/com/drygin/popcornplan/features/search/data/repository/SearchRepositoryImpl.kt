@@ -1,17 +1,16 @@
 package com.drygin.popcornplan.features.search.data.repository
 
+import com.drygin.popcornplan.common.data.local.dao.ImageDao
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
-import com.drygin.popcornplan.common.data.mapper.dto.toDomain
+import com.drygin.popcornplan.common.data.local.utils.saveMoviesPreservingFavorites
+import com.drygin.popcornplan.common.data.mapper.entity.toDomain
+import com.drygin.popcornplan.common.data.mapper.toEntities
 import com.drygin.popcornplan.common.data.mapper.toEntity
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.features.search.data.api.SearchApi
-import com.drygin.popcornplan.features.search.data.mapper.toDomain
-import com.drygin.popcornplan.features.search.domain.model.SearchItem
 import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -19,35 +18,24 @@ import javax.inject.Inject
  */
 class SearchRepositoryImpl @Inject constructor(
     private val searchApi: SearchApi,
-    val movieDao: MovieDao
+    val movieDao: MovieDao,
+    val imageDao: ImageDao
 ): ISearchRepository {
 
-    override suspend fun searchMovie(query: String): Flow<Result<List<Movie>>> = flow {
-        try {
-            val dtoList = searchApi.search(query)
+    override suspend fun searchAndStoreMovies(query: String): List<Int> {
+        val dtoList = searchApi.search(query)
+        val movieDtoList = dtoList.map { it.movie }
+        val entities = movieDtoList.map { it.toEntity() }
 
-            val movieDtoList = dtoList.map { it.movie }
-
-            val existingMovies = movieDao.getMoviesByIds(movieDtoList.map { it.ids.trakt })
-
-            val mergedMovies = movieDtoList.map { newMovie ->
-                val oldMovie = existingMovies.find { it.traktId == newMovie.ids.trakt }
-                newMovie.toEntity().copy(favorite = oldMovie?.favorite == true)
-            }
-
-            movieDao.insertAll(mergedMovies)
-
-            emit(Result.success(movieDtoList.map { it.toDomain() }))
-        } catch (e: Exception) {
-            emit(Result.failure(e))
+        movieDao.saveMoviesPreservingFavorites(entities)
+        movieDtoList.forEach { movieDto ->
+            val imageEntities = movieDto.images.toEntities(movieDto.ids.trakt)
+            imageDao.insertAll(imageEntities)
         }
+        return entities.map { it.traktId }
     }
 
-    override suspend fun onToggleFavorite(movieId: Int) {
-        withContext(Dispatchers.IO) {
-            movieDao.getMovie(movieId)?.let {
-                movieDao.insertAll(listOf(it.copy(favorite = !it.favorite)))
-            }
-        }
+    override fun observeMoviesByIds(ids: List<Int>): Flow<List<Movie>> {
+        return movieDao.getMoviesByIdsFlow(ids).map { it.map { e -> e.toDomain() } }
     }
 }

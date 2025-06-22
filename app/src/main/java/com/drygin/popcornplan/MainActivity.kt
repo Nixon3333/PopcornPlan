@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -47,17 +46,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.drygin.popcornplan.common.navigation.NavItem
-import com.drygin.popcornplan.common.ui.components.DetailsScreenTopBar
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.features.details.presentation.DetailsScreenContainer
 import com.drygin.popcornplan.features.details.presentation.DetailsScreenViewModel
 import com.drygin.popcornplan.features.favorite.presentation.FavoriteScreenContainer
-import com.drygin.popcornplan.features.favorite.presentation.FavoriteScreenViewModel
 import com.drygin.popcornplan.features.home.presentation.HomeScreenContainer
-import com.drygin.popcornplan.features.home.presentation.HomeScreenViewModel
 import com.drygin.popcornplan.features.reminder.presentation.RemindersScreenContainer
 import com.drygin.popcornplan.features.search.presentation.SearchScreenContainer
-import com.drygin.popcornplan.features.search.presentation.SearchScreenViewModel
 import com.drygin.popcornplan.preview.PreviewMocks
 import com.drygin.popcornplan.preview.home.HomeScreenPreview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -154,12 +149,6 @@ fun NavigationHost() {
     ) {
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
-            topBar = {
-                when (currentRoute) {
-                    NavItem.Planner.route -> TopAppBar(title = { Text("Планы") })
-                    else -> DetailsTopBarIfNeeded(navController, currentRoute)
-                }
-            },
             floatingActionButton = {
                 if (currentRoute == NavItem.Planner.route) {
                     RemindersFAB { showAddReminderDialog = true }
@@ -183,42 +172,20 @@ fun NavigationHost() {
                 }
 
                 composable(NavItem.Main.route) {
-                    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
-
-                    val onToggleFavorite: (Int) -> Unit = { movieId ->
-                        homeScreenViewModel.onToggleFavorite(movieId)
-                    }
-
-                    HomeScreenContainer(
-                        homeScreenViewModel,
-                        onMovieClick = onMovieClick,
-                        onToggleFavorite = onToggleFavorite
-                    )
+                    HomeScreenContainer(onMovieClick = onMovieClick)
                 }
                 composable(NavItem.Search.route) {
-                    val viewModel: SearchScreenViewModel = hiltViewModel()
-                    val onToggleFavorite: (Int) -> Unit = { movieId ->
-                        viewModel.onToggleFavorite(movieId)
-                    }
-                    SearchScreenContainer(
-                        viewModel,
-                        onMovieClick,
-                        onToggleFavorite
-                    )
+                    SearchScreenContainer(onMovieClick = onMovieClick)
                 }
                 composable(
                     NavItem.Details.route,
                     arguments = listOf(navArgument("movieId") { type = NavType.IntType })
                 ) { navBackStackEntry ->
                     val viewModel: DetailsScreenViewModel = hiltViewModel(navBackStackEntry)
-                    DetailsScreenContainer(viewModel)
+                    DetailsScreenContainer(viewModel) { navController.popBackStack() }
                 }
                 composable(NavItem.Favorites.route) {
-                    val viewModel: FavoriteScreenViewModel = hiltViewModel()
-                    val onToggleFavorite: (Int) -> Unit = { movieId ->
-                        viewModel.onToggleFavorite(movieId)
-                    }
-                    FavoriteScreenContainer(viewModel, onMovieClick, onToggleFavorite)
+                    FavoriteScreenContainer(onMovieClick = onMovieClick)
                 }
                 composable(NavItem.Planner.route) {
                     RemindersScreenContainer(
@@ -255,20 +222,6 @@ fun BottomNavBar(
                 icon = { Icon(navItem.icon, contentDescription = navItem.title) }
             )
         }
-    }
-}
-
-@Composable
-fun DetailsTopBarIfNeeded(
-    navController: NavHostController,
-    currentRoute: String?
-) {
-    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
-    val movieId = currentBackStackEntry?.arguments?.getInt("movieId")
-
-    if (currentRoute?.startsWith("details/") == true && movieId != null) {
-        val viewModel: DetailsScreenViewModel = hiltViewModel(currentBackStackEntry)
-        DetailsScreenTopBar(viewModel) { navController.popBackStack() }
     }
 }
 

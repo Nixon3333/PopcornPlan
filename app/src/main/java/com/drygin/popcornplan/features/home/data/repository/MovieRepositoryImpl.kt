@@ -16,10 +16,8 @@ import com.drygin.popcornplan.features.home.data.mapper.toDomain
 import com.drygin.popcornplan.features.home.data.paging.TrendingMoviesRemoteMediator
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -59,14 +57,6 @@ class MovieRepositoryImpl @Inject constructor(
         ).flow.map { pagingData ->
             pagingData.map { movieWithImages ->
                 movieWithImages.toDomain()
-            }
-        }
-    }
-
-    override suspend fun onToggleFavorite(movieId: Int) {
-        withContext(Dispatchers.IO) {
-            movieDao.getMovie(movieId)?.let {
-                movieDao.update(it.copy(favorite = !it.favorite))
             }
         }
     }

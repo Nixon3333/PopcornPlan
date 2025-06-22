@@ -7,7 +7,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.features.favorite.domain.repository.IFavoriteRepository
+import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
 import com.drygin.popcornplan.features.reminder.ReminderWorker
 import com.drygin.popcornplan.features.reminder.domain.model.Reminder
 import com.drygin.popcornplan.features.reminder.domain.repository.IReminderRepository

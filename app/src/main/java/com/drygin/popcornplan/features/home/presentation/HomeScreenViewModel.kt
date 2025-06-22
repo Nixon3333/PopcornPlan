@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,15 +17,16 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val repository: IMovieRepository
+    movieRepo: IMovieRepository,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
-    private val _movies = repository.getTrendingMovies().cachedIn(viewModelScope)
+    private val _movies = movieRepo.getTrendingMovies().cachedIn(viewModelScope)
     val movies: Flow<PagingData<TrendingMovie>> = _movies
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            repository.onToggleFavorite(movieId)
+            toggleFavoriteUseCase(movieId)
         }
     }
 }

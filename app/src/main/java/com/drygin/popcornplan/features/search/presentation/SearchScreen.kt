@@ -15,18 +15,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.drygin.popcornplan.common.ui.UiState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
-import com.drygin.popcornplan.features.search.domain.model.SearchItem
 import com.drygin.popcornplan.preview.PreviewMocks
 
 /**
@@ -34,53 +42,65 @@ import com.drygin.popcornplan.preview.PreviewMocks
  */
 @Composable
 fun SearchScreenContainer(
-    viewModel: SearchScreenViewModel,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    viewModel: SearchScreenViewModel = hiltViewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val movies by viewModel.movies.collectAsState()
     val query by viewModel.query.collectAsState()
     val onQueryChanged = viewModel::onQueryChanged
 
     SearchScreen(
-        uiState,
+        movies,
         query,
         onQueryChanged = onQueryChanged,
         onMovieClick = onMovieClick,
-        onToggleFavorite = onToggleFavorite
+        onToggleFavorite = viewModel::onToggleFavorite
     )
 }
 
 @Composable
 fun SearchScreen(
-    uiState: UiState<List<SearchItem>>,
+    movies: List<Movie>,
     query: String,
     onQueryChanged: (String) -> Unit,
     onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    onToggleFavorite: (Int) -> Unit,
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(text = query, selection = TextRange(query.length)))
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-        .padding(16.dp)
+            .padding(16.dp)
     ) {
         TextField(
-            value = query,
-            onValueChange = onQueryChanged,
+            value = textFieldValueState.value,
+            onValueChange = { newValue ->
+                textFieldValueState.value = newValue
+                onQueryChanged(newValue.text)
+            },
             placeholder = { Text("Search for movies...") },
             modifier = Modifier
-                .fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface
-            )
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        when (val state = uiState) {
-            is UiState.Loading -> {
+        when {
+            isLoading -> {
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -88,20 +108,33 @@ fun SearchScreen(
                 }
             }
 
-            is UiState.Success -> {
-                MovieList(state.data.map { it.movie }, onMovieClick, onToggleFavorite)
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = errorMessage,
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
 
-            is UiState.Error -> {
+            movies.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Text("No results", modifier = Modifier.align(Alignment.Center))
                 }
             }
+
+            else -> {
+                MovieList(movies, onMovieClick, onToggleFavorite)
+            }
         }
     }
 }
+
 @Preview
 @Composable
 fun SearchScreenPreview() {
@@ -111,7 +144,7 @@ fun SearchScreenPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             SearchScreen(
-                UiState.Success(PreviewMocks.sampleSearchItems),
+                PreviewMocks.sampleMovies,
                 "",
                 {},
                 {},

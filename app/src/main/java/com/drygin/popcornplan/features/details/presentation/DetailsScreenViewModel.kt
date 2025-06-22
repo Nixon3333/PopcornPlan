@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
 import com.drygin.popcornplan.features.details.domain.repository.IDetailsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsScreenViewModel @Inject constructor(
     private val repository: IDetailsRepository,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -27,7 +29,20 @@ class DetailsScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _movie.value = repository.getMovieDetails(movieId)
+            repository.observeMovieDetails(movieId)
+                .collect {
+                    _movie.value = it
+                }
+        }
+
+        viewModelScope.launch {
+            repository.refreshMovieDetails(movieId)
+        }
+    }
+
+    fun onToggleFavorite(movieId: Int) {
+        viewModelScope.launch {
+            toggleFavoriteUseCase(movieId)
         }
     }
 }
