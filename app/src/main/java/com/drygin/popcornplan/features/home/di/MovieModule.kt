@@ -1,13 +1,9 @@
 package com.drygin.popcornplan.features.home.di
 
-import com.drygin.popcornplan.common.data.local.AppDatabase
-import com.drygin.popcornplan.common.data.local.dao.ImageDao
-import com.drygin.popcornplan.common.data.local.dao.MovieDao
-import com.drygin.popcornplan.common.data.local.dao.TrendingDao
-import com.drygin.popcornplan.common.utils.TransactionRunner
 import com.drygin.popcornplan.features.home.data.api.MovieApi
 import com.drygin.popcornplan.features.home.data.repository.MovieRepositoryImpl
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,29 +16,16 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object MovieModule {
-
-    @Provides
+abstract class MovieModule {
+    @Binds
     @Singleton
-    fun provideMovieApi(retrofit: Retrofit): MovieApi {
-        return retrofit.create(MovieApi::class.java)
-    }
+    abstract fun bindMovieRepository(repoImpl: MovieRepositoryImpl) : IMovieRepository
 
-    @Provides
-    @Singleton
-    fun provideTransactionRunner(db: AppDatabase): TransactionRunner {
-        return TransactionRunner(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideMovieRepository(
-        api: MovieApi,
-        movieDao: MovieDao,
-        imageDao: ImageDao,
-        trendingMovieDao: TrendingDao,
-        transactionRunner: TransactionRunner
-    ) : IMovieRepository {
-        return MovieRepositoryImpl(api, movieDao, imageDao, trendingMovieDao, transactionRunner)
+    companion object {
+        @Provides
+        @Singleton
+        fun provideMovieApi(retrofit: Retrofit): MovieApi {
+            return retrofit.create(MovieApi::class.java)
+        }
     }
 }

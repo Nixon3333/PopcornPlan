@@ -1,10 +1,9 @@
 package com.drygin.popcornplan.features.favorite.di
 
-import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.repository.FavoriteRepositoryImpl
 import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -14,10 +13,8 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object FavoriteModule {
-    @Provides
+abstract class FavoriteModule {
+    @Binds
     @Singleton
-    fun provideFavoriteRepository(
-        movieDao: MovieDao
-    ) : IFavoriteRepository = FavoriteRepositoryImpl(movieDao)
+    abstract fun bindFavoriteRepository(repoImpl: FavoriteRepositoryImpl) : IFavoriteRepository
 }

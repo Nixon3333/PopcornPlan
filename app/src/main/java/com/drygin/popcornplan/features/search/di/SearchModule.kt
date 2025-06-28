@@ -1,10 +1,9 @@
 package com.drygin.popcornplan.features.search.di
 
-import com.drygin.popcornplan.common.data.local.dao.ImageDao
-import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.features.search.data.api.SearchApi
 import com.drygin.popcornplan.features.search.data.repository.SearchRepositoryImpl
 import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,20 +16,16 @@ import javax.inject.Singleton
  */
 @InstallIn(SingletonComponent::class)
 @Module
-object SearchModule {
-    @Provides
+abstract class SearchModule {
+    @Binds
     @Singleton
-    fun provideSearchApi(retrofit: Retrofit): SearchApi {
-        return retrofit.create(SearchApi::class.java)
-    }
+    abstract fun bindSearchRepository(repoImpl: SearchRepositoryImpl) : ISearchRepository
 
-    @Provides
-    @Singleton
-    fun provideSearchRepository(
-        api: SearchApi,
-        movieDao: MovieDao,
-        imageDao: ImageDao
-    ) : ISearchRepository {
-        return SearchRepositoryImpl(api, movieDao, imageDao)
+    companion object {
+        @Provides
+        @Singleton
+        fun provideSearchApi(retrofit: Retrofit): SearchApi {
+            return retrofit.create(SearchApi::class.java)
+        }
     }
 }
