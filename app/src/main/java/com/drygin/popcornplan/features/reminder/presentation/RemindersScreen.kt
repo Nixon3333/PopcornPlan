@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.DateTimePicker
 import com.drygin.popcornplan.common.ui.components.ExposedDropdown
+import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.features.reminder.domain.model.Reminder
 import com.drygin.popcornplan.preview.PreviewMocks
@@ -138,17 +139,16 @@ fun ReminderItem(
             ZoneId.systemDefault()
         ).format(dateTimeFormatter)
     }
-
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(Dimens.PaddingSmall)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(Dimens.PaddingMedium)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

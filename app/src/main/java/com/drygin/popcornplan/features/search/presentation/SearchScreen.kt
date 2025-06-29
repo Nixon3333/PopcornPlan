@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
+import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.preview.PreviewMocks
 
@@ -82,7 +83,7 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(Dimens.PaddingMedium)
     ) {
         TextField(
             value = textFieldValueState.value,

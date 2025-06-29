@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.drygin.popcornplan.common.ui.components.MovieCard
+import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 
 /**
@@ -40,12 +41,12 @@ fun TrendingCard(
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(8.dp)
+                .padding(Dimens.PaddingSmall)
                 .background(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = Dimens.PaddingSmall, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

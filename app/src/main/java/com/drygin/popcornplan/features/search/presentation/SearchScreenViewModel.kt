@@ -37,6 +37,9 @@ class SearchScreenViewModel @Inject constructor(
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
@@ -50,6 +53,7 @@ class SearchScreenViewModel @Inject constructor(
                         flowOf(emptyList())
                     } else {
                         flow {
+                            _isLoading.value = true
                             try {
                                 val ids = searchRepo.searchAndStoreMovies(query)
                                 emitAll(
@@ -57,6 +61,7 @@ class SearchScreenViewModel @Inject constructor(
                                 )
                             } catch (e: Exception) {
                                 _errorMessage.value = e.stackTraceToString()
+                                _isLoading.value = false
                                 emit(emptyList())
                             }
                         }
@@ -66,6 +71,7 @@ class SearchScreenViewModel @Inject constructor(
                 .collect { movies ->
                     _movies.value = movies
                     _errorMessage.value = null
+                    _isLoading.value = false
                 }
         }
     }

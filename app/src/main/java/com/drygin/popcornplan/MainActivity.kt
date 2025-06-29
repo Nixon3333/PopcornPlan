@@ -139,7 +139,7 @@ fun NavigationHost() {
                 (context as Activity).moveTaskToBack(true)
             } else {
                 backPressedTime = currentTime
-                scope.launch { snackbarHostState.showSnackbar("Нажмите ещё раз, чтобы выйти") }
+                scope.launch { snackbarHostState.showSnackbar("Повторите свайп, чтобы выйти") }
             }
         }
     }

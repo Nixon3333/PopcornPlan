@@ -59,7 +59,7 @@ fun MovieCard(
                     movie.isFavorite,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(8.dp)
+                        .padding(Dimens.PaddingSmall)
                         .size(Dimens.FavoriteButtonSize)
                 ) {
                     onToggleFavorite()
@@ -72,7 +72,7 @@ fun MovieCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(72.dp)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .padding(horizontal = 12.dp, vertical = Dimens.PaddingSmall)
             ) {
                 Text(
                     text = movie.title,

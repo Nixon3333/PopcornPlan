@@ -84,7 +84,7 @@ fun MovieItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = Dimens.PaddingSmall)
             .clickable { onMovieClick() }
             .clip(RoundedCornerShape(Dimens.MovieCardCornerRadius)),
         elevation = CardDefaults.cardElevation(2.dp),
@@ -108,14 +108,14 @@ fun MovieItem(
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(end = 8.dp),
+                            .padding(end = Dimens.PaddingSmall),
                         shape = RoundedCornerShape(Dimens.MovieCardCornerRadius),
                         tonalElevation = 4.dp
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp)
+                                .padding(Dimens.PaddingSmall)
                         ) {
                         Column(
                             modifier = Modifier
