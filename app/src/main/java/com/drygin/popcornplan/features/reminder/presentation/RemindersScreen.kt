@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -152,15 +153,36 @@ fun ReminderItem(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text(text = reminder.title, style = MaterialTheme.typography.titleMedium)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Text(
+                    text = reminder.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                if (reminder.description.isNotEmpty()) {
+                    Text(
+                        text = reminder.description,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
                 Text(
                     text = "Время: $formattedTime",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .padding(top = Dimens.PaddingSmall)
                 )
             }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Удалить")
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = "Удалить напоминание")
             }
         }
     }
