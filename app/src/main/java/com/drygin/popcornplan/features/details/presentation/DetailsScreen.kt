@@ -1,8 +1,10 @@
 package com.drygin.popcornplan.features.details.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,6 +16,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.drygin.popcornplan.common.domain.model.Movie
@@ -52,7 +55,8 @@ fun DetailsScreen(
             title = {
                 Text(
                     text = movie?.title ?: "Загрузка...",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             },
             navigationIcon = {
@@ -65,6 +69,25 @@ fun DetailsScreen(
         movie?.let {
             MovieDetailsContent(it, onToggleFavorite)
         }
+
+        if (movie?.overview?.isEmpty() == true)
+            EmptyMovieOverview()
+    }
+}
+
+@Composable
+fun EmptyMovieOverview() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Text(
+            text = "Описание не загружено",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 

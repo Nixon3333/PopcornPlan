@@ -1,5 +1,6 @@
 package com.drygin.popcornplan.features.details.data.reposiroty
 
+import android.util.Log
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.local.utils.saveMoviesPreservingFavorites
 import com.drygin.popcornplan.common.data.mapper.entity.toDomain
@@ -18,6 +19,8 @@ import javax.inject.Inject
 /**
  * Created by Drygin Nikita on 24.05.2025.
  */
+const val TAG = "DetailsRepositoryImpl"
+
 class DetailsRepositoryImpl @Inject constructor(
     private val api: MovieDetailsApi,
     private val movieDao: MovieDao
@@ -33,9 +36,13 @@ class DetailsRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val localMovie = movieDao.movieWithImages(movieId)?.toDomain()
             if (localMovie == null || localMovie.overview.isEmpty()) {
-                val remoteMovieDto = api.getMovieDetails(movieId)
-                val movieEntity = remoteMovieDto.toEntity()
-                movieDao.saveMoviesPreservingFavorites(listOf(movieEntity))
+                try {
+                    val remoteMovieDto = api.getMovieDetails(movieId)
+                    val movieEntity = remoteMovieDto.toEntity()
+                    movieDao.saveMoviesPreservingFavorites(listOf(movieEntity))
+                } catch (e: Exception) {
+                    Log.e(TAG, "refreshMovieDetails error: ${e.stackTraceToString()}")
+                }
             }
         }
     }

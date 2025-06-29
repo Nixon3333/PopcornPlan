@@ -17,6 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.FavoriteButton
@@ -43,7 +47,7 @@ fun MovieDetailsContent(
 
         Column(
             modifier = Modifier
-                .padding(top = 200.dp, start = 8.dp, end = 8.dp)
+                .padding(top = 200.dp, start = Dimens.PaddingSmall, end = Dimens.PaddingSmall)
         ) {
             Row(
                 verticalAlignment = Alignment.Top,
@@ -58,15 +62,26 @@ fun MovieDetailsContent(
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = Dimens.PaddingSmall)
+                        
                 ) {
-                    Text(movie.title, style = MaterialTheme.typography.titleLarge)
-                    Text("Year: ${movie.year}")
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.headlineMedium.addStroke(),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = "Year: ${movie.year}",
+                        style = MaterialTheme.typography.bodyLarge.addStroke(),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
                 FavoriteButton(
                     movie.isFavorite,
                     modifier = Modifier
-                        .padding(end = 8.dp)
+                        .padding(end = Dimens.PaddingSmall)
                         .size(Dimens.FavoriteButtonSize)
                 ) {
                     onToggleFavorite(movie.ids.trakt)
@@ -78,3 +93,12 @@ fun MovieDetailsContent(
         }
     }
 }
+
+fun TextStyle.addStroke() =
+    this.copy(
+        shadow = Shadow(
+            color = Color.Black,
+            offset = Offset(1f, 1f),
+            blurRadius = 1f
+        )
+    )
