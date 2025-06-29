@@ -48,11 +48,13 @@ fun SearchScreenContainer(
 ) {
     val movies by viewModel.movies.collectAsState()
     val query by viewModel.query.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val onQueryChanged = viewModel::onQueryChanged
 
     SearchScreen(
         movies,
         query,
+        isLoading,
         onQueryChanged = onQueryChanged,
         onMovieClick = onMovieClick,
         onToggleFavorite = viewModel::onToggleFavorite
@@ -63,10 +65,10 @@ fun SearchScreenContainer(
 fun SearchScreen(
     movies: List<Movie>,
     query: String,
+    isLoading: Boolean,
     onQueryChanged: (String) -> Unit,
     onMovieClick: (Int) -> Unit,
     onToggleFavorite: (Int) -> Unit,
-    isLoading: Boolean = false,
     errorMessage: String? = null
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -84,22 +86,8 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(Dimens.PaddingMedium)
+            .padding(bottom = Dimens.PaddingLarge)
     ) {
-        TextField(
-            value = textFieldValueState.value,
-            onValueChange = { newValue ->
-                textFieldValueState.value = newValue
-                onQueryChanged(newValue.text)
-            },
-            placeholder = { Text("Search for movies...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         when {
             isLoading -> {
                 Box(
@@ -133,6 +121,19 @@ fun SearchScreen(
                 MovieList(movies, onMovieClick, onToggleFavorite)
             }
         }
+        TextField(
+            value = textFieldValueState.value,
+            onValueChange = { newValue ->
+                textFieldValueState.value = newValue
+                onQueryChanged(newValue.text)
+            },
+            singleLine = true,
+            placeholder = { Text("Search for movies...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+        )
     }
 }
 
@@ -147,6 +148,7 @@ fun SearchScreenPreview() {
             SearchScreen(
                 PreviewMocks.sampleMovies,
                 "",
+                false,
                 {},
                 {},
                 {}
