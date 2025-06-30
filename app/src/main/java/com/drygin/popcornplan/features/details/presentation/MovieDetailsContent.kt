@@ -24,7 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.FavoriteButton
-import com.drygin.popcornplan.common.ui.components.ShimmerAsyncImage
+import com.drygin.popcornplan.common.ui.components.PosterImage
 import com.drygin.popcornplan.common.ui.theme.Dimens
 
 /**
@@ -36,7 +36,7 @@ fun MovieDetailsContent(
     onToggleFavorite: (Int) -> Unit
 ) {
     Box {
-        ShimmerAsyncImage(
+        PosterImage(
             model = "https://" + movie.images.fanart.firstOrNull(),
             contentDescription = null,
             modifier = Modifier
@@ -53,7 +53,7 @@ fun MovieDetailsContent(
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                ShimmerAsyncImage(
+                PosterImage(
                     model = "https://" + movie.images.poster.firstOrNull(),
                     contentDescription = movie.title,
                     modifier = Modifier

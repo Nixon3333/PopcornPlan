@@ -6,7 +6,7 @@ import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 /**
  * Created by Drygin Nikita on 11.06.2025.
  */
-fun TrendingMovie.toEntity(page: Int) = TrendingMovieEntity(
+fun TrendingMovie.toEntity(page: Int = 1) = TrendingMovieEntity(
     traktId = this.movie.ids.trakt,
     watchers,
     page

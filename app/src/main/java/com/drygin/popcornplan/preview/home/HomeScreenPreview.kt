@@ -16,8 +16,7 @@ import com.drygin.popcornplan.features.home.presentation.SectionTitle
 @Composable
 fun HomeScreenPreview(
     movies: List<TrendingMovie>,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    onMovieClick: (Int) -> Unit
 ) {
     val horizontalListState = rememberLazyListState()
     LazyColumn(
@@ -33,8 +32,7 @@ fun HomeScreenPreview(
             HorizontalMovieListPreview(
                 movies = movies,
                 horizontalListState,
-                onMovieClick = onMovieClick,
-                onToggleFavorite = onToggleFavorite
+                onMovieClick = onMovieClick
             )
         }
     }

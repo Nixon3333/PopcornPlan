@@ -8,5 +8,6 @@ import kotlinx.coroutines.flow.Flow
  * Created by Drygin Nikita on 23.05.2025.
  */
 interface IMovieRepository {
-    fun getTrendingMovies(): Flow<PagingData<TrendingMovie>>
+    fun getTrendingMoviesPaging(): Flow<PagingData<TrendingMovie>>
+    suspend fun getTopTrending(limit: Int): List<TrendingMovie>
 }

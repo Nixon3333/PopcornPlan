@@ -20,7 +20,9 @@ interface TrendingDao {
     suspend fun insertTrendingMovie(trending: TrendingMovieEntity)
 
     @Query("SELECT * FROM trending_movies ORDER BY pageIndex, watchers DESC")
-    fun getTrendingMovies(): PagingSource<Int, TrendingMovieWithImages>
+    fun getTrendingMoviesPaging(): PagingSource<Int, TrendingMovieWithImages>
+    @Query("SELECT * FROM trending_movies ORDER BY watchers DESC")
+    suspend fun getTrendingMovies(): List<TrendingMovieWithImages>
 
     @Query("SELECT * FROM trending_movies WHERE traktId IN (:ids)")
     fun getMoviesByIds(ids: List<Int>): List<TrendingMovieWithImages>

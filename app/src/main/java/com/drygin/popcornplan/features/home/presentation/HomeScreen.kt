@@ -1,16 +1,17 @@
 package com.drygin.popcornplan.features.home.presentation
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,20 +19,27 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
+import coil.Coil
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.drygin.popcornplan.R
 import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -42,20 +50,42 @@ fun HomeScreenContainer(
     viewModel: HomeScreenViewModel = hiltViewModel(),
     onMovieClick: (Int) -> Unit
 ) {
-    val movies = viewModel.movies.collectAsLazyPagingItems()
+    val movies = viewModel.movies.value
+    val isRefreshing = viewModel.isRefreshing.value
+    val context = LocalContext.current
+
+    val isFirstLoad = rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        if (isFirstLoad.value) {
+            val loaded = viewModel.refresh()
+            preloadPosters(context, loaded)
+            isFirstLoad.value = false
+        }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
     HomeScreen(
         movies,
-        onMovieClick,
-        viewModel::onToggleFavorite
+        isRefreshing,
+        onRefresh = {
+            coroutineScope.launch {
+                val newMovies = viewModel.refresh()
+                preloadPosters(context, newMovies)
+            }
+        },
+        onMovieClick
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    movies: LazyPagingItems<TrendingMovie>,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    movies: List<TrendingMovie>,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onMovieClick: (Int) -> Unit
 ) {
     val recompositionCounter = remember { mutableIntStateOf(0) }
     SideEffect {
@@ -63,40 +93,27 @@ fun HomeScreen(
         Log.d("RECOMPOSE", "HomeScreen recomposed ${recompositionCounter.intValue} times")
     }
 
-    val isRefreshing = movies.loadState.refresh == LoadState.Loading
-
-    val horizontalListState = rememberLazyListState()
-
-    /*LaunchedEffect(movies.itemSnapshotList) {
-        val refreshState = movies.loadState.refresh
-        if (refreshState is LoadState.NotLoading) {
-            horizontalListState.animateScrollToItem(0)
-        }
-    }*/
-
     PullToRefreshBox(
         isRefreshing = isRefreshing,
-        onRefresh = { movies.refresh() },
+        onRefresh = { onRefresh() },
         modifier = Modifier
             .padding(vertical = Dimens.VerticalListSpacing)
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
         ) {
-            item {
-                SectionTitle(
-                    title = stringResource(id = R.string.trending),
-                    onShowAllClick = { /* TODO */ },
-                )
-            }
-            item {
-                HorizontalPagingMovieList(
-                    movies = movies,
-                    horizontalListState,
-                    onMovieClick = onMovieClick,
-                    onToggleFavorite = onToggleFavorite
-                )
-            }
+            SectionTitle(
+                title = stringResource(id = R.string.trending),
+                onShowAllClick = { /* TODO */ },
+            )
+            HorizontalPagingMovieList(
+                movies = movies,
+                onMovieClick = onMovieClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimens.MovieCardHeight + 72.dp + 24.dp)
+            )
         }
     }
 }
@@ -123,61 +140,56 @@ fun SectionTitle(title: String, onShowAllClick: () -> Unit) {
 
 @Composable
 fun HorizontalPagingMovieList(
-    movies: LazyPagingItems<TrendingMovie>,
-    listState: LazyListState,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    movies: List<TrendingMovie>,
+    modifier: Modifier = Modifier,
+    onMovieClick: (Int) -> Unit
 ) {
-    val loadedMovies by remember {
-        derivedStateOf {
-            (0 until movies.itemCount).mapNotNull { index ->
-                val movie = movies.peek(index)
-                movie?.let { index to it }
-            }
-        }
-    }
-
     LazyRow(
-        state = listState,
         contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing)
+        horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing),
+        modifier = modifier
     ) {
         items(
-            items = loadedMovies,
-            key = { (_, movie) -> movie.movie.ids.trakt }
-        ) { (_, movie) ->
-            TrendingCard(
-                trendingMovie = movie,
-                onClick = { onMovieClick(movie.movie.ids.trakt) },
-                onToggleFavorite = { onToggleFavorite(movie.movie.ids.trakt) }
-            )
+            count = movies.size,
+            key = { index -> movies[index].movie.ids.trakt },
+            contentType = { "movie_card" }
+        ) { index ->
+            println("Отрисовываем карточку $index")
+            val movie = movies[index]
+                TrendingCard(
+                    movie,
+                    onClick = { onMovieClick(movie.movie.ids.trakt) },
+                )
         }
     }
 }
 
+suspend fun preloadPosters(context: Context, movies: List<TrendingMovie>) {
+    withContext(Dispatchers.IO) {
+        val imageLoader = Coil.imageLoader(context)
 
-/*@Composable
-fun HorizontalPagingMovieList(
-    movies: LazyPagingItems<TrendingMovie>,
-    listState: LazyListState,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
-) {
-    LazyRow(
-        state = listState,
-        contentPadding = PaddingValues(horizontal = Dimens.PaddingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.HorizontalItemSpacing)
-    ) {
-        items(
-            movies.itemCount,
-            key = { index -> movies.peek(index)?.movie?.ids?.trakt ?: index }) { index ->
-            movies[index]?.let { movie ->
-                TrendingCard(
-                    movie,
-                    onClick = { onMovieClick(movie.movie.ids.trakt) },
-                    onToggleFavorite = { onToggleFavorite(movie.movie.ids.trakt) }
-                )
+        Log.d("PRELOAD", "▶️ Начинаем прогрев ${movies.size} постеров")
+
+        val start = System.currentTimeMillis()
+
+        movies.forEach { movie ->
+            val posterUrl = "https://${movie.movie.images.poster.firstOrNull()}"
+            val request = ImageRequest.Builder(context)
+                .data(posterUrl)
+                .size(128, 192)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build()
+
+            val result = imageLoader.execute(request)
+            if (result is SuccessResult) {
+                Log.d("PRELOAD", "✅ ${movie.movie.title} -> ${result.dataSource}")
+            } else {
+                Log.e("PRELOAD", "❌ Ошибка загрузки ${movie.movie.title}")
             }
         }
+
+        val duration = System.currentTimeMillis() - start
+        Log.d("PRELOAD", "🏁 Прогрев завершён за ${duration}ms")
     }
-}*/
+}

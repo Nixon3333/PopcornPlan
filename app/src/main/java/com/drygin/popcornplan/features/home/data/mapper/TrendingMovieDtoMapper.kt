@@ -8,7 +8,7 @@ import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 /**
  * Created by Drygin Nikita on 11.06.2025.
  */
-fun TrendingMovieDto.toDomain(page: Int) = TrendingMovie(
+fun TrendingMovieDto.toDomain(page: Int = 1) = TrendingMovie(
     watchers = watchers,
     movie = movie.toDomain(),
     page = page

@@ -27,15 +27,12 @@ import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 @Composable
 fun TrendingCard(
     trendingMovie: TrendingMovie,
-    onToggleFavorite: () -> Unit,
     onClick: () -> Unit
 ) {
     Box {
         MovieCard(
-            movie = trendingMovie.movie,
-            onToggleFavorite = onToggleFavorite,
-            onClick = onClick
-        )
+            trendingMovie.movie,
+        ) { onClick() }
 
         // Счётчик просмотров — накладывается сверху MovieCard
         Row(
@@ -44,7 +41,7 @@ fun TrendingCard(
                 .padding(Dimens.PaddingSmall)
                 .background(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(Dimens.MovieCardCornerRadius)
                 )
                 .padding(horizontal = Dimens.PaddingSmall, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically

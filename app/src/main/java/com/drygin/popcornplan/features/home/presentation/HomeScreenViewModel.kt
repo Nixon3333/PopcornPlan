@@ -1,14 +1,12 @@
 package com.drygin.popcornplan.features.home.presentation
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
 import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,12 +15,20 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    movieRepo: IMovieRepository,
+    val movieRepo: IMovieRepository,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
-    private val _movies = movieRepo.getTrendingMovies().cachedIn(viewModelScope)
-    val movies: Flow<PagingData<TrendingMovie>> = _movies
+    val isRefreshing = mutableStateOf(false)
+    val movies = mutableStateOf<List<TrendingMovie>>(emptyList())
+
+    suspend fun refresh(): List<TrendingMovie> {
+        isRefreshing.value = true
+        val newMovies = movieRepo.getTopTrending(10)
+        movies.value = newMovies
+        isRefreshing.value = false
+        return newMovies
+    }
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {

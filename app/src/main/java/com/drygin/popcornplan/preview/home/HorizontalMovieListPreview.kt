@@ -17,8 +17,7 @@ import com.drygin.popcornplan.features.home.presentation.TrendingCard
 fun HorizontalMovieListPreview(
     movies: List<TrendingMovie>,
     listState: LazyListState,
-    onMovieClick: (Int) -> Unit,
-    onToggleFavorite: (Int) -> Unit
+    onMovieClick: (Int) -> Unit
 ) {
     LazyRow(
         state = listState,
@@ -31,8 +30,7 @@ fun HorizontalMovieListPreview(
         ) { movie ->
             TrendingCard(
                 movie,
-                onClick = { onMovieClick(movie.movie.ids.trakt) },
-                onToggleFavorite = { onToggleFavorite(movie.movie.ids.trakt) }
+                onClick = { onMovieClick(movie.movie.ids.trakt) }
             )
         }
     }

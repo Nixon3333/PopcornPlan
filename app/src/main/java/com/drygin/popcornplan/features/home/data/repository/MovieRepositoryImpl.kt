@@ -6,11 +6,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.map
-import com.drygin.popcornplan.common.data.local.dao.ImageDao
-import com.drygin.popcornplan.common.data.local.dao.MovieDao
-import com.drygin.popcornplan.common.data.local.dao.TrendingDao
+import com.drygin.popcornplan.common.data.local.AppDatabase
 import com.drygin.popcornplan.common.data.local.relation.TrendingMovieWithImages
-import com.drygin.popcornplan.common.utils.TransactionRunner
 import com.drygin.popcornplan.features.home.data.api.MovieApi
 import com.drygin.popcornplan.features.home.data.mapper.toDomain
 import com.drygin.popcornplan.features.home.data.paging.TrendingMoviesRemoteMediator
@@ -25,33 +22,27 @@ import javax.inject.Inject
  */
 class MovieRepositoryImpl @Inject constructor(
     private val api: MovieApi,
-    private val movieDao: MovieDao,
-    private val imageDao: ImageDao,
-    private val trendingMovieDao: TrendingDao,
-    private val transactionRunner: TransactionRunner
+    private val database: AppDatabase,
+    private val trendingSaver: TrendingMovieSaver
 ) : IMovieRepository {
-
     private var pagingSource: PagingSource<Int, TrendingMovieWithImages>? = null
 
     @OptIn(ExperimentalPagingApi::class)
-    override fun getTrendingMovies(): Flow<PagingData<TrendingMovie>> {
+    override fun getTrendingMoviesPaging(): Flow<PagingData<TrendingMovie>> {
         val pagingSourceFactory = {
-            val source = trendingMovieDao.getTrendingMovies()
+            val source = database.trendingDao().getTrendingMoviesPaging()
             pagingSource = source
             source
         }
 
         return Pager(
             config = PagingConfig(
-                pageSize = 20, //todo Пробросить значение
-                initialLoadSize = 20,
+                pageSize = 30, //todo Пробросить значение
+                initialLoadSize = 15,
                 prefetchDistance = 5),
             remoteMediator = TrendingMoviesRemoteMediator(
                 api,
-                movieDao,
-                imageDao,
-                trendingMovieDao,
-                withTransaction = transactionRunner::run
+                trendingSaver
             ),
             pagingSourceFactory = pagingSourceFactory
         ).flow.map { pagingData ->
@@ -59,5 +50,10 @@ class MovieRepositoryImpl @Inject constructor(
                 movieWithImages.toDomain()
             }
         }
+    }
+
+    override suspend fun getTopTrending(limit: Int): List<TrendingMovie> {
+        val response = api.getTrendingMovies(limit = limit)
+        return trendingSaver.saveTrendingMovies(response)
     }
 }

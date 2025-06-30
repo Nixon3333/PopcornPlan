@@ -13,7 +13,7 @@ data class MovieDto(
     val overview: String? = null,
     val released: String? = null,
     val runtime: Int = 0,
-    val country: String = "",
+    val country: String? = "",
     val trailer: String? = null,
     val homepage: String? = null,
     val status: String? = null,
