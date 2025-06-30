@@ -3,14 +3,12 @@ package com.drygin.popcornplan.features.reminder.presentation
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
-import com.drygin.popcornplan.features.reminder.ReminderWorker
 import com.drygin.popcornplan.features.reminder.domain.model.Reminder
 import com.drygin.popcornplan.features.reminder.domain.repository.IReminderRepository
+import com.drygin.popcornplan.features.reminder.utils.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +17,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -84,23 +81,7 @@ class RemindersScreenViewModel @Inject constructor(
     }
 
     private fun scheduleReminder(context: Context, reminder: Reminder) {
-        val delay = reminder.reminderTime - System.currentTimeMillis()
-        if (delay <= 0) return
-
-        val request = OneTimeWorkRequestBuilder<ReminderWorker>()
-            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            .setInputData(
-                workDataOf(
-                    "reminderId" to reminder.id,
-                    "title" to reminder.title,
-                    "tmdbId" to reminder.traktId,
-                    "type" to reminder.type
-                )
-            )
-            .addTag(reminder.id)
-            .build()
-
-        WorkManager.getInstance(context).enqueue(request)
+        ReminderScheduler.scheduleReminder(context, reminder)
     }
 
     private fun cancelScheduledReminder(context: Context, reminder: Reminder) {

@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation)
     implementation(libs.androidx.compose.viewmodel)
+    implementation(libs.icons.extended)
 
     // Coil
     implementation(libs.coil)
