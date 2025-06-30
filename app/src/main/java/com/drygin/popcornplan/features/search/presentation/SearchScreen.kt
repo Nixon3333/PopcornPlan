@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -26,11 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.drygin.popcornplan.common.domain.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
@@ -72,53 +70,54 @@ fun SearchScreen(
     errorMessage: String? = null
 ) {
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
     val textFieldValueState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(text = query, selection = TextRange(query.length)))
     }
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-        keyboardController?.show()
+        if (textFieldValueState.value.text.isEmpty())
+            focusRequester.requestFocus()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(Dimens.PaddingMedium)
-            .padding(bottom = Dimens.PaddingLarge)
     ) {
-        when {
-            isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        Box(modifier = Modifier.weight(1f)) {
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
-            }
 
-            errorMessage != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = errorMessage,
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.error
-                    )
+                errorMessage != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = errorMessage,
+                            modifier = Modifier.align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
-            }
 
-            movies.isEmpty() -> {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text("No results", modifier = Modifier.align(Alignment.Center))
+                movies.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Text("No results", modifier = Modifier.align(Alignment.Center))
+                    }
                 }
-            }
 
-            else -> {
-                MovieList(movies, onMovieClick, onToggleFavorite)
+                else -> {
+                    MovieList(movies, onMovieClick, onToggleFavorite)
+                }
             }
         }
         TextField(
@@ -133,6 +132,12 @@ fun SearchScreen(
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+        )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding()
         )
     }
 }
