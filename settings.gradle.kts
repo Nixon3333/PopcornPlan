@@ -1,24 +1,20 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://plugins.gradle.org/m2/")
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") // Для compose-multiplatform
     }
 }
+rootProject.name = "PopcornPlan"
 
-rootProject.name = "Popcorn Plan"
-include(":app")
- 
+include(":shared")
+include(":androidApp")

@@ -55,7 +55,6 @@ import com.drygin.popcornplan.features.search.presentation.SearchScreenContainer
 import com.drygin.popcornplan.preview.PreviewMocks
 import com.drygin.popcornplan.preview.home.HomeScreenPreview
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
