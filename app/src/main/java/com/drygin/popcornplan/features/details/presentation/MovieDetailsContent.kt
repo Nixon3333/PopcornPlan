@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.ui.components.FavoriteButton
 import com.drygin.popcornplan.common.ui.components.PosterImage
 import com.drygin.popcornplan.common.ui.theme.Dimens

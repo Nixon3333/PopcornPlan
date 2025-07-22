@@ -8,23 +8,22 @@ import androidx.paging.PagingSource
 import androidx.paging.map
 import com.drygin.popcornplan.common.data.local.AppDatabase
 import com.drygin.popcornplan.common.data.local.relation.TrendingMovieWithImages
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
+import com.drygin.popcornplan.common.domain.movie.repository.MovieRepository
 import com.drygin.popcornplan.features.home.data.api.MovieApi
 import com.drygin.popcornplan.features.home.data.mapper.toDomain
 import com.drygin.popcornplan.features.home.data.paging.TrendingMoviesRemoteMediator
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
-import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 23.05.2025.
  */
-class MovieRepositoryImpl @Inject constructor(
+class MovieRepositoryImpl(
     private val api: MovieApi,
     private val database: AppDatabase,
     private val trendingSaver: TrendingMovieSaver
-) : IMovieRepository {
+) : MovieRepository {
     private var pagingSource: PagingSource<Int, TrendingMovieWithImages>? = null
 
     @OptIn(ExperimentalPagingApi::class)

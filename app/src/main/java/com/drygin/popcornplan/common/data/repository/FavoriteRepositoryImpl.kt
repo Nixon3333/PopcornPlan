@@ -2,20 +2,19 @@ package com.drygin.popcornplan.common.data.repository
 
 import com.drygin.popcornplan.common.data.local.dao.MovieDao
 import com.drygin.popcornplan.common.data.mapper.entity.toDomain
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
+import com.drygin.popcornplan.common.domain.favorite.repository.FavoriteRepository
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 02.06.2025.
  */
-class FavoriteRepositoryImpl @Inject constructor(
+class FavoriteRepositoryImpl(
     private val movieDao: MovieDao,
-) : IFavoriteRepository {
+) : FavoriteRepository {
     override suspend fun getFavoriteMovies(): Flow<List<Movie>> =
         movieDao.movies()
             .map { entities ->

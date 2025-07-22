@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.drygin.popcornplan.common.ui.components.MovieCard
 import com.drygin.popcornplan.common.ui.theme.Dimens
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

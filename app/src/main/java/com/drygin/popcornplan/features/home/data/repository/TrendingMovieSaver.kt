@@ -9,12 +9,11 @@ import com.drygin.popcornplan.features.home.data.mapper.toDomain
 import com.drygin.popcornplan.features.home.data.mapper.toEntity
 import com.drygin.popcornplan.features.home.data.mapper.toMovieDto
 import com.drygin.popcornplan.features.home.data.model.TrendingMovieDto
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 30.06.2025.
  */
-class TrendingMovieSaver @Inject constructor(
+class TrendingMovieSaver(
     private val database: AppDatabase
 ) {
     suspend fun saveTrendingMovies(

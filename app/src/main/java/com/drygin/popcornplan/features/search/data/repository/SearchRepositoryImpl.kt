@@ -6,21 +6,20 @@ import com.drygin.popcornplan.common.data.local.utils.saveMoviesPreservingFavori
 import com.drygin.popcornplan.common.data.mapper.entity.toDomain
 import com.drygin.popcornplan.common.data.mapper.toEntities
 import com.drygin.popcornplan.common.data.mapper.toEntity
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.features.search.data.api.SearchApi
-import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
+import com.drygin.popcornplan.features.search.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 28.05.2025.
  */
-class SearchRepositoryImpl @Inject constructor(
+class SearchRepositoryImpl(
     private val searchApi: SearchApi,
     val movieDao: MovieDao,
     val imageDao: ImageDao
-): ISearchRepository {
+): SearchRepository {
 
     override suspend fun searchAndStoreMovies(query: String): List<Int> {
         val dtoList = searchApi.search(query)

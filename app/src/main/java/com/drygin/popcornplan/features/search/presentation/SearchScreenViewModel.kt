@@ -2,10 +2,9 @@ package com.drygin.popcornplan.features.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
-import com.drygin.popcornplan.features.search.domain.repository.ISearchRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
+import com.drygin.popcornplan.common.domain.movie.model.Movie
+import com.drygin.popcornplan.common.domain.search.usecase.SearchUseCases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -19,16 +18,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 28.05.2025.
  */
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class SearchScreenViewModel @Inject constructor(
-    private val searchRepo: ISearchRepository,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+class SearchScreenViewModel(
+    private val searchUseCases: SearchUseCases,
+    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase
 ) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
@@ -55,9 +52,9 @@ class SearchScreenViewModel @Inject constructor(
                         flow {
                             _isLoading.value = true
                             try {
-                                val ids = searchRepo.searchAndStoreMovies(query)
+                                val ids = searchUseCases.searchMovies(query)
                                 emitAll(
-                                    searchRepo.observeMoviesByIds(ids)
+                                    searchUseCases.observeMoviesByIds(ids)
                                 )
                             } catch (e: Exception) {
                                 _errorMessage.value = e.stackTraceToString()
@@ -82,7 +79,7 @@ class SearchScreenViewModel @Inject constructor(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            toggleFavoriteUseCase(movieId)
+            toggleFavoriteMovieUseCase(movieId)
         }
     }
 }

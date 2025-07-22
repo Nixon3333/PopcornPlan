@@ -13,19 +13,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
 import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.preview.PreviewMocks
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Created by Drygin Nikita on 02.06.2025.
  */
 @Composable
 fun FavoriteScreenContainer(
-    viewModel: FavoriteScreenViewModel = hiltViewModel(),
+    viewModel: FavoriteScreenViewModel = koinViewModel(),
     onMovieClick: (Int) -> Unit
 ) {
     val movies by viewModel.movies.collectAsState()

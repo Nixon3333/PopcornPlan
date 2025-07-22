@@ -2,20 +2,17 @@ package com.drygin.popcornplan.features.favorite.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.common.domain.repository.IFavoriteRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 02.06.2025.
  */
-@HiltViewModel
-class FavoriteScreenViewModel @Inject constructor(
-    val repository: IFavoriteRepository
+class FavoriteScreenViewModel(
+    private val favouriteUseCases: FavouriteUseCases
 ) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
@@ -23,7 +20,7 @@ class FavoriteScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getFavoriteMovies().collect {
+            favouriteUseCases.getFavourite().collect {
                 _movies.value = it
             }
         }
@@ -31,7 +28,7 @@ class FavoriteScreenViewModel @Inject constructor(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            repository.onToggleFavorite(movieId)
+            favouriteUseCases.toggleFavorite(movieId)
         }
     }
 }

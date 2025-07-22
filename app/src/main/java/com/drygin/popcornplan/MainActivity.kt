@@ -29,10 +29,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -50,14 +54,14 @@ import com.drygin.popcornplan.features.reminder.presentation.RemindersScreenCont
 import com.drygin.popcornplan.features.search.presentation.SearchScreenContainer
 import com.drygin.popcornplan.preview.PreviewMocks
 import com.drygin.popcornplan.preview.home.HomeScreenPreview
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false) // для прозрачности
         setContent {
             PopcornPlanTheme {
                 PopcornPlan()
@@ -68,35 +72,32 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PopcornPlan() {
-    ApplyStatusBarColor()
+    ApplySystemBarsColors()
     NavigationHost()
 }
 
 @Composable
-fun ApplyStatusBarColor() {
-    val systemUiController = rememberSystemUiController()
-    val background = MaterialTheme.colorScheme.background
-    val surface = MaterialTheme.colorScheme.surface
+fun ApplySystemBarsColors(
+    statusBarColor: Color = MaterialTheme.colorScheme.background,
+    navigationBarColor: Color = MaterialTheme.colorScheme.surface
+) {
+    val view = LocalView.current
+    val activity = view.context as? Activity ?: return
 
-    val useDarkIconsForStatusBar = background.luminance() > 0.5f
-    val useDarkIconsForNavBar = surface.luminance() > 0.5f
+    val window = activity.window
 
+    val darkIconsForStatusBar = statusBarColor.luminance() > 0.5f
+    val darkIconsForNavBar = navigationBarColor.luminance() > 0.5f
 
     SideEffect {
-        systemUiController.setStatusBarColor(
-            color = background,
-            darkIcons = useDarkIconsForStatusBar
-        )
-    }
+        window.statusBarColor = statusBarColor.toArgb()
+        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = darkIconsForStatusBar
 
-    // TODO: Перенести, это метод для StatusBar
-    SideEffect {
-        systemUiController.setNavigationBarColor(
-            color = surface,
-            darkIcons = useDarkIconsForNavBar
-        )
+        window.navigationBarColor = navigationBarColor.toArgb()
+        WindowInsetsControllerCompat(window, view).isAppearanceLightNavigationBars = darkIconsForNavBar
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -162,7 +163,7 @@ fun NavigationHost() {
                     NavItem.Details.route,
                     arguments = listOf(navArgument("movieId") { type = NavType.IntType })
                 ) { navBackStackEntry ->
-                    val viewModel: DetailsScreenViewModel = hiltViewModel(navBackStackEntry)
+                    val viewModel: DetailsScreenViewModel = koinViewModel(viewModelStoreOwner = navBackStackEntry)
                     DetailsScreenContainer(viewModel) { navController.popBackStack() }
                 }
                 composable(NavItem.Favorites.route) {

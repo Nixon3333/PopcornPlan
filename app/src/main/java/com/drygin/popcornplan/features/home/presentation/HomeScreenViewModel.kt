@@ -3,20 +3,17 @@ package com.drygin.popcornplan.features.home.presentation
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
-import com.drygin.popcornplan.features.home.domain.repository.IMovieRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
+import com.drygin.popcornplan.common.domain.movie.usecase.MovieUseCases
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 22.05.2025.
  */
-@HiltViewModel
-class HomeScreenViewModel @Inject constructor(
-    val movieRepo: IMovieRepository,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+class HomeScreenViewModel(
+    private val movieUseCases: MovieUseCases,
+    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase
 ) : ViewModel() {
 
     val isRefreshing = mutableStateOf(false)
@@ -24,7 +21,7 @@ class HomeScreenViewModel @Inject constructor(
 
     suspend fun refresh(): List<TrendingMovie> {
         isRefreshing.value = true
-        val newMovies = movieRepo.getTopTrending(10)
+        val newMovies = movieUseCases.getTopTrending(10)
         movies.value = newMovies
         isRefreshing.value = false
         return newMovies
@@ -32,7 +29,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            toggleFavoriteUseCase(movieId)
+            toggleFavoriteMovieUseCase(movieId)
         }
     }
 }

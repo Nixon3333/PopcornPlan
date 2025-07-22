@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 
 /**

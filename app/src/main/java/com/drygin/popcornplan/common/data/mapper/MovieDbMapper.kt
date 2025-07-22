@@ -4,7 +4,7 @@ import com.drygin.popcornplan.common.data.local.entity.ImageEntity
 import com.drygin.popcornplan.common.data.local.entity.MovieEntity
 import com.drygin.popcornplan.common.data.model.ImagesDto
 import com.drygin.popcornplan.common.data.model.MovieDto
-import com.drygin.popcornplan.common.domain.model.ImageType
+import com.drygin.popcornplan.common.domain.movie.model.ImageType
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

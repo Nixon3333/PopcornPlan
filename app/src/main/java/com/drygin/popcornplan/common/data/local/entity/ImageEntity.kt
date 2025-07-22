@@ -1,8 +1,7 @@
 package com.drygin.popcornplan.common.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.drygin.popcornplan.common.domain.model.ImageType
+import com.drygin.popcornplan.common.domain.movie.model.ImageType
 
 /**
  * Created by Drygin Nikita on 05.06.2025.

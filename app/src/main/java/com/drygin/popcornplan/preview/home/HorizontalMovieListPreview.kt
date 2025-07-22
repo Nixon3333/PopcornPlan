@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import com.drygin.popcornplan.common.ui.theme.Dimens
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
 import com.drygin.popcornplan.features.home.presentation.TrendingCard
 
 /**

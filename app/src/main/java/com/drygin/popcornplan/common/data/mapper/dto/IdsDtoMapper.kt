@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.common.data.mapper.dto
 
 import com.drygin.popcornplan.common.data.model.IdsDto
-import com.drygin.popcornplan.common.domain.model.Ids
+import com.drygin.popcornplan.common.domain.movie.model.Ids
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

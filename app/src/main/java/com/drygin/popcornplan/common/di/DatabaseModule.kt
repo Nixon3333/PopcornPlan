@@ -1,42 +1,25 @@
 package com.drygin.popcornplan.common.di
 
-import android.content.Context
 import androidx.room.Room
 import com.drygin.popcornplan.common.data.local.AppDatabase
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.dsl.module
 
 /**
  * Created by Drygin Nikita on 30.05.2025.
  */
-@Module
-@InstallIn(SingletonComponent::class)
-object DatabaseModule {
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
+val databaseModule = module {
+    single {
+        Room.databaseBuilder(
+            get(),
             AppDatabase::class.java,
             "pp_database"
         )
-            .fallbackToDestructiveMigration() // TODO: Только для дебага
+            .fallbackToDestructiveMigration()
             .build()
     }
 
-    @Provides
-    fun provideMovieDao(database: AppDatabase) = database.movieDao()
-
-    @Provides
-    fun provideReminderDao(database: AppDatabase) = database.reminderDao()
-
-    @Provides
-    fun provideImageDao(database: AppDatabase) = database.imageDao()
-
-    @Provides
-    fun provideTrendingDao(database: AppDatabase) = database.trendingDao()
+    single { get<AppDatabase>().movieDao() }
+    single { get<AppDatabase>().reminderDao() }
+    single { get<AppDatabase>().imageDao() }
+    single { get<AppDatabase>().trendingDao() }
 }

@@ -44,14 +44,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
+import com.drygin.popcornplan.common.domain.reminder.model.Reminder
 import com.drygin.popcornplan.common.ui.components.DateTimePicker
 import com.drygin.popcornplan.common.ui.components.ExposedDropdown
 import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
-import com.drygin.popcornplan.features.reminder.domain.model.Reminder
 import com.drygin.popcornplan.preview.PreviewMocks
+import org.koin.androidx.compose.koinViewModel
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -78,7 +78,7 @@ val dateTimeFormatter: DateTimeFormatter =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemindersScreenContainer(
-    viewModel: RemindersScreenViewModel = hiltViewModel(),
+    viewModel: RemindersScreenViewModel = koinViewModel(),
     showAddDialog: Boolean,
     onDismissDialog: () -> Unit
 ) {

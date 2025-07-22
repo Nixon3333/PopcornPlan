@@ -29,19 +29,19 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.drygin.popcornplan.common.domain.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.ui.components.MovieList
 import com.drygin.popcornplan.common.ui.theme.Dimens
 import com.drygin.popcornplan.common.ui.theme.PopcornPlanTheme
 import com.drygin.popcornplan.preview.PreviewMocks
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Created by Drygin Nikita on 28.05.2025.
  */
 @Composable
 fun SearchScreenContainer(
-    viewModel: SearchScreenViewModel = hiltViewModel(),
+    viewModel: SearchScreenViewModel = koinViewModel(),
     onMovieClick: (Int) -> Unit
 ) {
     val movies by viewModel.movies.collectAsState()

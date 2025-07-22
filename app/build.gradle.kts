@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.hilt)
+    //alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
@@ -34,6 +34,14 @@ android {
         }
 
         buildConfigField("String", "TRAKT_API_KEY", "\"${traktApiKey}\"")
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += mapOf(
+                    "room.schemaLocation" to "$projectDir/schemas"
+                )
+            }
+        }
     }
 
     buildTypes {
@@ -65,6 +73,10 @@ android {
     }
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -83,13 +95,6 @@ dependencies {
     // Coil
     implementation(libs.coil)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.system.ui.controller)
-    implementation(libs.hilt.work)
-
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.moshi)
@@ -107,13 +112,17 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
     implementation(libs.room.paging)
-
-    // WorkManager
-    implementation(libs.androidx.work)
+    implementation(libs.room.runtime)
 
     // Paging 3
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.navigation) // SavedStateHandle
+    implementation(libs.koin.compose) // getViewModel() в Compose
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

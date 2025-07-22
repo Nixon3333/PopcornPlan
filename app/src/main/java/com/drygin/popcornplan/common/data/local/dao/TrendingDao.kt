@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.drygin.popcornplan.common.data.local.entity.TrendingMovieEntity
 import com.drygin.popcornplan.common.data.local.relation.TrendingMovieWithImages
 
@@ -19,11 +20,14 @@ interface TrendingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrendingMovie(trending: TrendingMovieEntity)
 
+    @Transaction
     @Query("SELECT * FROM trending_movies ORDER BY pageIndex, watchers DESC")
     fun getTrendingMoviesPaging(): PagingSource<Int, TrendingMovieWithImages>
+    @Transaction
     @Query("SELECT * FROM trending_movies ORDER BY watchers DESC")
     suspend fun getTrendingMovies(): List<TrendingMovieWithImages>
 
+    @Transaction
     @Query("SELECT * FROM trending_movies WHERE traktId IN (:ids)")
     fun getMoviesByIds(ids: List<Int>): List<TrendingMovieWithImages>
 

@@ -3,22 +3,19 @@ package com.drygin.popcornplan.features.details.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.common.domain.usecase.ToggleFavoriteUseCase
-import com.drygin.popcornplan.features.details.domain.repository.IDetailsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.drygin.popcornplan.common.domain.details.usecase.DetailsUseCases
+import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
+import com.drygin.popcornplan.common.domain.movie.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Created by Drygin Nikita on 23.05.2025.
  */
-@HiltViewModel
-class DetailsScreenViewModel @Inject constructor(
-    private val repository: IDetailsRepository,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+class DetailsScreenViewModel(
+    private val detailsUseCases: DetailsUseCases,
+    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -29,20 +26,20 @@ class DetailsScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.observeMovieDetails(movieId)
+            detailsUseCases.observeMovieDetails(movieId)
                 .collect {
                     _movie.value = it
                 }
         }
 
         viewModelScope.launch {
-            repository.refreshMovieDetails(movieId)
+            detailsUseCases.refreshMovieDetails(movieId)
         }
     }
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            toggleFavoriteUseCase(movieId)
+            toggleFavoriteMovieUseCase(movieId)
         }
     }
 }

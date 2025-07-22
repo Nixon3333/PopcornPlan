@@ -16,12 +16,15 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface MovieDao {
+    @Transaction
     @Query("SELECT * FROM movies")
     fun movies(): Flow<List<MovieWithImages>>
 
+    @Transaction
     @Query("SELECT * FROM movies WHERE traktId IN (:ids)")
     suspend fun getMoviesByIds(ids: List<Int>): List<MovieWithImages>
 
+    @Transaction
     @Query("SELECT * FROM movies WHERE traktId IN (:ids)")
     fun getMoviesByIdsFlow(ids: List<Int>): Flow<List<MovieWithImages>>
 

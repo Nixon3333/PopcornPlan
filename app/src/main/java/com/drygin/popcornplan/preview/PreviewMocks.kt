@@ -1,11 +1,11 @@
 package com.drygin.popcornplan.preview
 
 import androidx.paging.PagingData
-import com.drygin.popcornplan.common.domain.model.Ids
-import com.drygin.popcornplan.common.domain.model.Movie
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
-import com.drygin.popcornplan.features.reminder.domain.model.Reminder
-import com.drygin.popcornplan.features.search.domain.model.SearchItem
+import com.drygin.popcornplan.common.domain.movie.model.Ids
+import com.drygin.popcornplan.common.domain.movie.model.Movie
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
+import com.drygin.popcornplan.common.domain.reminder.model.Reminder
+import com.drygin.popcornplan.common.domain.search.model.SearchItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

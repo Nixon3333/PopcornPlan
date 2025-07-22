@@ -29,17 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.Coil
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.drygin.popcornplan.R
+import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
 import com.drygin.popcornplan.common.ui.theme.Dimens
-import com.drygin.popcornplan.features.home.domain.model.TrendingMovie
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.compose.koinViewModel
 
 
 /**
@@ -47,7 +47,7 @@ import kotlinx.coroutines.withContext
  */
 @Composable
 fun HomeScreenContainer(
-    viewModel: HomeScreenViewModel = hiltViewModel(),
+    viewModel: HomeScreenViewModel = koinViewModel(),
     onMovieClick: (Int) -> Unit
 ) {
     val movies = viewModel.movies.value

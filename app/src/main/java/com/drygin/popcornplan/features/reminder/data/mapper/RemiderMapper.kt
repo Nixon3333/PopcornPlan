@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.features.reminder.data.mapper
 
 import com.drygin.popcornplan.features.reminder.data.local.entity.ReminderEntity
-import com.drygin.popcornplan.features.reminder.domain.model.Reminder
+import com.drygin.popcornplan.common.domain.reminder.model.Reminder
 
 /**
  * Created by Drygin Nikita on 04.06.2025.
