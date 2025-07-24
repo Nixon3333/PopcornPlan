@@ -3,8 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://plugins.gradle.org/m2/")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") // нужен для plugin 'org.jetbrains.kotlin.plugin.compose'
     }
 }
 dependencyResolutionManagement {
@@ -16,5 +15,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PopcornPlan"
 
-include(":shared")
 include(":androidApp")
+include(":shared")

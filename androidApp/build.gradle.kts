@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.composePlugin)
 }
 
 android.buildFeatures.buildConfig = true
@@ -24,8 +25,19 @@ android {
         applicationId = "com.drygin.popcornplan"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
+
+        applicationVariants.all {
+            outputs.all {
+                val appName = "PopcornPlan"
+                val versionName = versionName
+                val buildType = buildType.name
+
+                val outputFile = "$appName-v$versionName.apk"
+                (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName = outputFile
+            }
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,9 +74,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -77,6 +86,7 @@ ksp {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
@@ -89,35 +99,12 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.androidx.compose.viewmodel)
     implementation(libs.icons.extended)
+    implementation(platform(libs.androidx.compose.bom))
 
     // Coil
     implementation(libs.coil)
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.moshi)
-
-    // Moshi
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
-
-    // OkHttp with logs
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-
-    // Room
-    ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
-    implementation(libs.room.paging)
-    implementation(libs.room.runtime)
-
-    // Paging 3
-    implementation(libs.paging.runtime)
-    implementation(libs.paging.compose)
-
     // Koin
-    implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.navigation) // SavedStateHandle
     implementation(libs.koin.compose) // getViewModel() в Compose

@@ -1,0 +1,27 @@
+package com.drygin.popcornplan.core.notifications
+
+import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.annotation.RequiresPermission
+import com.drygin.popcornplan.common.domain.reminder.usecase.CancelNotificationUseCase
+import com.drygin.popcornplan.common.domain.reminder.usecase.NotificationUseCases
+import com.drygin.popcornplan.common.domain.reminder.usecase.ShowReminderNotificationUseCase
+import org.koin.java.KoinJavaComponent.getKoin
+
+/**
+ * Created by Drygin Nikita on 29.06.2025.
+ */
+class ReminderReceiver : BroadcastReceiver() {
+
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    override fun onReceive(context: Context, intent: Intent?) {
+        val title = intent?.getStringExtra("title") ?: return
+        val message = intent.getStringExtra("message") ?: "Напоминание"
+
+        val useCases: NotificationUseCases = getKoin().get()
+
+        useCases.showReminder(title.hashCode(), title, message)
+    }
+}

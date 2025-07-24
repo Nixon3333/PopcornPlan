@@ -1,74 +1,77 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinCompose)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
-    androidTarget()
-    iosSimulatorArm64()
-    jvm("desktop")
+    androidLibrary {
+        namespace = "com.drygin.popcornplan"
+        compileSdk = 36
+        minSdk = 26
+    }
+
+    val xcfName = "sharedKit"
+
+    iosSimulatorArm64 {
+        binaries.framework {
+            baseName = xcfName
+        }
+    }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
-                implementation(libs.compose.runtime)
-                implementation(libs.compose.foundation)
-                implementation(libs.compose.material)
-                implementation(libs.compose.ui)
-                implementation(libs.compose.resources)
+                implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.uuid)
+                implementation(libs.koin.core)
             }
         }
 
-        val androidMain by getting {
+        commonTest {
             dependencies {
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-                implementation(libs.coil)
-                implementation(libs.koin.android)
-                implementation(libs.koin.androidx.navigation)
-                implementation(libs.koin.compose)
+                implementation(libs.kotlin.test)
+            }
+        }
 
+        androidMain {
+            dependencies {
+                // Retrofit
                 implementation(libs.retrofit)
                 implementation(libs.converter.moshi)
+
+                // Moshi
+                implementation(libs.moshi)
+                implementation(libs.moshi.kotlin)
+
+                // OkHttp with logs
                 implementation(libs.okhttp)
                 implementation(libs.logging.interceptor)
 
+                // Room
                 implementation(libs.room.ktx)
-                implementation(libs.room.runtime)
                 implementation(libs.room.paging)
+                implementation(libs.room.runtime)
 
+                // Paging 3
                 implementation(libs.paging.runtime)
                 implementation(libs.paging.compose)
 
-                //implementation(libs.androidx.navigation)
-                //implementation(libs.androidx.activity.compose)
-                //implementation(platform(libs.androidx.compose.bom))
-                //implementation(libs.androidx.compose.ui)
-                //implementation(libs.androidx.compose.ui.graphics)
-                //implementation(libs.androidx.compose.ui.tooling.preview)
-                //implementation(libs.androidx.compose.material3)
-                //implementation(libs.androidx.compose.viewmodel)
-                //implementation(libs.icons.extended)
+                // Koin
+                implementation(libs.koin.core)
             }
         }
 
-        val iosSimulatorArm64Main by getting {
-            dependsOn(commonMain)
-        }
-
-        val desktopMain by getting {
-            dependsOn(commonMain)
+        iosMain {
             dependencies {
-                implementation(libs.compose.desktop.currentOs)
+                
             }
         }
     }
 }
 
-android {
-    namespace = "com.drygin.popcornplan.shared"
-    compileSdk = 35
-    defaultConfig {
-        minSdk = 26
-    }
+dependencies {
+    kspAndroid(libs.moshi.kotlin.codegen)
+    kspAndroid(libs.room.compiler)
 }

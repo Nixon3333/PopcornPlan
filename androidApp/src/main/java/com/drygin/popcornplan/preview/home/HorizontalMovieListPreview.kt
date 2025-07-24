@@ -6,9 +6,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import com.drygin.popcornplan.common.ui.theme.Dimens
+import com.drygin.popcornplan.core.ui.theme.Dimens
 import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
-import com.drygin.popcornplan.features.home.presentation.TrendingCard
+import com.drygin.popcornplan.features.home.TrendingCard
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

@@ -1,6 +1,5 @@
 package com.drygin.popcornplan.preview
 
-import androidx.paging.PagingData
 import com.drygin.popcornplan.common.domain.movie.model.Ids
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
@@ -83,7 +82,7 @@ object PreviewMocks {
         Reminder("9", 90, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
     )
 
-    fun <T : Any> List<T>.toPagingData(): PagingData<T> = PagingData.from(this)
+    /*fun <T : Any> List<T>.toPagingData(): PagingData<T> = PagingData.from(this)
 
-    val mockedMoviesFlow: Flow<PagingData<TrendingMovie>> = flowOf(sampleTrendingMovies.toPagingData())
+    val mockedMoviesFlow: Flow<PagingData<TrendingMovie>> = flowOf(sampleTrendingMovies.toPagingData())*/
 }
