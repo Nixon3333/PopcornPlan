@@ -17,3 +17,4 @@ rootProject.name = "PopcornPlan"
 
 include(":androidApp")
 include(":shared")
+include(":backend")

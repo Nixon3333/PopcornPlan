@@ -5,6 +5,8 @@ plugins {
 }
 
 kotlin {
+    jvm()
+
     androidLibrary {
         namespace = "com.drygin.popcornplan"
         compileSdk = 36
@@ -22,10 +24,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.kotlin.stdlib)
-                implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.uuid)
-                implementation(libs.koin.core)
+                api(libs.kotlin.stdlib)
+                api(libs.kotlinx.coroutines.core)
+
+                api(libs.uuid)
+                api(libs.koin.core)
             }
         }
 

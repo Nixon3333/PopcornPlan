@@ -49,3 +49,5 @@ gradle/wrapper/gradle-wrapper.jar
 
 # Google Services JSON (Firebase)
 google-services.json
+
+.env
