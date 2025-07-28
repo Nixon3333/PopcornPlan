@@ -17,7 +17,9 @@ import storage.repository.ReminderRepository
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-fun Route.reminderRoutes() {
+fun Route.reminderRoutes(
+    reminderRepository: ReminderRepository
+) {
     route("/reminders") {
         get {
             val userId = call.principal<UserPrincipal>()?.userId
@@ -25,12 +27,12 @@ fun Route.reminderRoutes() {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
-            call.respond(ReminderRepository.getAll(userId))
+            call.respond(reminderRepository.getAll(userId))
         }
 
         post {
             val reminderDto = call.receive<ReminderDto>()
-            ReminderRepository.add(reminderDto)
+            reminderRepository.add(reminderDto)
             call.respond(HttpStatusCode.Created)
         }
 
@@ -39,7 +41,7 @@ fun Route.reminderRoutes() {
             val userId = call.principal<UserPrincipal>()?.userId
 
             if (tmdbId != null && userId != null) {
-                ReminderRepository.delete(userId, tmdbId)
+                reminderRepository.delete(userId, tmdbId)
                 call.respond(HttpStatusCode.OK)
             } else {
                 call.respond(HttpStatusCode.BadRequest)

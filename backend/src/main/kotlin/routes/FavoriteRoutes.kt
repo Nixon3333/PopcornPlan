@@ -17,7 +17,9 @@ import storage.repository.FavoriteRepository
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-fun Route.favoriteRoutes() {
+fun Route.favoriteRoutes(
+    favoriteRepository: FavoriteRepository
+) {
     route("/favorites") {
         get {
             val userId = call.principal<UserPrincipal>()?.userId
@@ -26,12 +28,12 @@ fun Route.favoriteRoutes() {
                 return@get
             }
 
-            call.respond(FavoriteRepository.getAll(userId))
+            call.respond(favoriteRepository.getAll(userId))
         }
 
         post {
             val favoriteDTO = call.receive<FavoriteDto>()
-            FavoriteRepository.add(favoriteDTO)
+            favoriteRepository.add(favoriteDTO)
             call.respond(HttpStatusCode.Created)
         }
 
@@ -43,7 +45,7 @@ fun Route.favoriteRoutes() {
                 return@delete
             }
 
-            FavoriteRepository.delete(userId, tmdbId)
+            favoriteRepository.delete(userId, tmdbId)
             call.respond(HttpStatusCode.OK)
         }
     }

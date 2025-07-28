@@ -14,7 +14,10 @@ import storage.repository.ReminderRepository
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-fun Route.syncRoutes() {
+fun Route.syncRoutes(
+    reminderRepository: ReminderRepository,
+    favoriteRepository: FavoriteRepository
+) {
     get("/sync") {
         val userId = call.principal<UserPrincipal>()?.userId
         if (userId == null) {
@@ -24,8 +27,8 @@ fun Route.syncRoutes() {
 
         call.respond(
             SyncResponseDto(
-                favorites = FavoriteRepository.getAll(userId),
-                reminders = ReminderRepository.getAll(userId)
+                favorites = favoriteRepository.getAll(userId),
+                reminders = reminderRepository.getAll(userId)
             )
         )
     }

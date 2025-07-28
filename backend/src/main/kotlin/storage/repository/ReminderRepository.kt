@@ -1,6 +1,11 @@
 package storage.repository
 
+import io.ktor.server.application.Application
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import model.ReminderDto
+import model.SyncEvent
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -8,11 +13,12 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import storage.db.Reminders
+import ws.WebSocketSessionRegistry
 
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-object ReminderRepository {
+class ReminderRepository(private val app: Application) {
 
     fun getAll(userId: String): List<ReminderDto> = transaction {
         Reminders.selectAll().where { Reminders.userId eq userId }
@@ -39,11 +45,25 @@ object ReminderRepository {
             it[reminderTime] = reminder.reminderTime
             it[createdAt] = reminder.createdAt
         }
+
+        app.launch {
+            WebSocketSessionRegistry.sendToUser(
+                reminder.userId,
+                Json.encodeToString(SyncEvent.ReminderAdded(reminder))
+            )
+        }
     }
 
     fun delete(userId: String, tmdbId: Int) = transaction {
         Reminders.deleteWhere {
             (Reminders.userId eq userId) and (Reminders.tmdbId eq tmdbId)
+        }
+
+        app.launch {
+            WebSocketSessionRegistry.sendToUser(
+                userId,
+                Json.encodeToString(SyncEvent.ReminderRemoved(tmdbId))
+            )
         }
     }
 }
