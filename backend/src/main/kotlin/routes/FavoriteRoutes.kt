@@ -1,5 +1,6 @@
 package routes
 
+import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
 import config.UserPrincipal
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -11,7 +12,6 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import model.FavoriteDto
 import storage.repository.FavoriteRepository
 
 /**
@@ -32,8 +32,11 @@ fun Route.favoriteRoutes(
         }
 
         post {
+            val userId = call.principal<UserPrincipal>()?.userId
+                ?: return@post call.respond(HttpStatusCode.Unauthorized)
+
             val favoriteDTO = call.receive<FavoriteDto>()
-            favoriteRepository.add(favoriteDTO)
+            favoriteRepository.add(userId, favoriteDTO.tmdbId)
             call.respond(HttpStatusCode.Created)
         }
 

@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import com.drygin.popcornplan.core.ui.theme.Dimens
 import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
-import com.drygin.popcornplan.features.home.TrendingCard
+import com.drygin.popcornplan.features.trending.TrendingCard
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

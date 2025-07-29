@@ -2,7 +2,7 @@ package com.drygin.popcornplan.features.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
+import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.domain.search.usecase.SearchUseCases
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class SearchScreenViewModel(
     private val searchUseCases: SearchUseCases,
-    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase
+    private val favouriteUseCases: FavouriteUseCases
 ) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
@@ -79,7 +79,7 @@ class SearchScreenViewModel(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            toggleFavoriteMovieUseCase(movieId)
+            favouriteUseCases.toggleFavorite(movieId)
         }
     }
 }

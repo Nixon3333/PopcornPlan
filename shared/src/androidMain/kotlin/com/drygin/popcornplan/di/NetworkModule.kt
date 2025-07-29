@@ -1,44 +1,53 @@
 package com.drygin.popcornplan.di
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import com.drygin.popcornplan.features.details.data.remote.api.MovieDetailsApi
+import com.drygin.popcornplan.features.favorite.data.remote.api.FavoriteApi
+import com.drygin.popcornplan.features.search.data.remote.api.SearchApi
+import com.drygin.popcornplan.features.trending.data.remote.api.MovieApi
+import com.drygin.popcornplan.network.HttpClientProvider
+import com.drygin.popcornplan.network.ServerHttpClientProvider
+import com.drygin.popcornplan.network.TraktApiHttpClientProvider
+import com.drygin.popcornplan.reatures.favorite.data.remote.FavoriteApiImpl
+import kotlinx.serialization.json.Json
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 /**
- * Created by Drygin Nikita on 22.07.2025.
+ * Created by Drygin Nikita on 29.07.2025.
  */
 val networkModule = module {
-    single {
-        Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
+    single { Json { ignoreUnknownKeys = true } }
+
+    single<HttpClientProvider>(named("trakt")) {
+        TraktApiHttpClientProvider(get())
+    }
+
+    single<HttpClientProvider>(named("server")) {
+        ServerHttpClientProvider(get())
     }
 
     single {
-        val apiKey: String = get()
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .addHeader("trakt-api-version", "2")
-                    .addHeader("trakt-api-key", apiKey)
-                    .build()
-                chain.proceed(request)
-            }
-            .build()
+        val clientProvider = get<HttpClientProvider>(named("trakt"))
+        val apiKey = get<String>(named("traktApiKey"))
+        MovieDetailsApi(clientProvider, apiKey)
     }
 
     single {
-        Retrofit.Builder()
-            .baseUrl("https://api.trakt.tv/")
-            .client(get())
-            .addConverterFactory(MoshiConverterFactory.create(get()))
-            .build()
+        val clientProvider = get<HttpClientProvider>(named("trakt"))
+        val apiKey = get<String>(named("traktApiKey"))
+        MovieApi(clientProvider, apiKey)
+    }
+
+    single {
+        val clientProvider = get<HttpClientProvider>(named("trakt"))
+        val apiKey = get<String>(named("traktApiKey"))
+        SearchApi(clientProvider, apiKey)
+    }
+
+    single<FavoriteApi> {
+        FavoriteApiImpl(
+            client = get<HttpClientProvider>(named("server")).getClient(),
+            tokenRepository = get()
+        )
     }
 }

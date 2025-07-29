@@ -42,6 +42,7 @@ postgres = "42.7.3"
 hikari = "5.1.0"
 jwt = "4.4.0"
 dotenv = "6.4.1"
+datastore = "1.1.7"
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -76,6 +77,7 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingCompose" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingCompose" }
 icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "icons" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -115,6 +117,12 @@ ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", versio
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 

@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 2
-        versionName = "1.1.0"
+        versionName = "1.3.1"
 
         applicationVariants.all {
             outputs.all {
@@ -105,7 +105,6 @@ dependencies {
     implementation(libs.coil)
 
     // Koin
-    implementation(libs.koin.android)
     implementation(libs.koin.androidx.navigation) // SavedStateHandle
     implementation(libs.koin.compose) // getViewModel() в Compose
 

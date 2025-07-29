@@ -1,5 +1,6 @@
 package routes
 
+import com.drygin.popcornplan.features.sync.data.remote.dto.SyncResponseDto
 import config.UserPrincipal
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -7,7 +8,6 @@ import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import model.SyncResponseDto
 import storage.repository.FavoriteRepository
 import storage.repository.ReminderRepository
 

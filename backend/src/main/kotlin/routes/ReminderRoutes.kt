@@ -1,5 +1,6 @@
 package routes
 
+import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
 import config.UserPrincipal
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -11,7 +12,6 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import model.ReminderDto
 import storage.repository.ReminderRepository
 
 /**
@@ -36,12 +36,12 @@ fun Route.reminderRoutes(
             call.respond(HttpStatusCode.Created)
         }
 
-        delete("/{tmdbId}") {
-            val tmdbId = call.parameters["tmdbId"]?.toIntOrNull()
+        delete("/{reminderId}") {
+            val reminderId = call.parameters["reminderId"]
             val userId = call.principal<UserPrincipal>()?.userId
 
-            if (tmdbId != null && userId != null) {
-                reminderRepository.delete(userId, tmdbId)
+            if (reminderId != null && userId != null) {
+                reminderRepository.delete(userId, reminderId)
                 call.respond(HttpStatusCode.OK)
             } else {
                 call.respond(HttpStatusCode.BadRequest)

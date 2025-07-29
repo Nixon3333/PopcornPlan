@@ -5,8 +5,6 @@ import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
 import com.drygin.popcornplan.common.domain.reminder.model.Reminder
 import com.drygin.popcornplan.common.domain.search.model.SearchItem
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 /**
  * Created by Drygin Nikita on 11.06.2025.
@@ -71,15 +69,15 @@ object PreviewMocks {
     )
 
     val sampleReminders = listOf(
-        Reminder("1", 10, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("2", 20, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("3", 30, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("4", 40, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("5", 50, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("6", 60, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("7", 70, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("8", 80, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
-        Reminder("9", 90, "Title", "", "", System.currentTimeMillis() + 5000L, null, System.currentTimeMillis()),
+        Reminder("1", 10, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("2", 20, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("3", 30, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("4", 40, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("5", 50, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("6", 60, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("7", 70, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("8", 80, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
+        Reminder("9", 90, "Title", "", "", System.currentTimeMillis() + 5000L, /*null,*/ System.currentTimeMillis()),
     )
 
     /*fun <T : Any> List<T>.toPagingData(): PagingData<T> = PagingData.from(this)

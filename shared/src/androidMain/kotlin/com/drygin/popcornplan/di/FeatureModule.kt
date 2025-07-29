@@ -20,25 +20,21 @@ import com.drygin.popcornplan.common.domain.reminder.usecase.ScheduleReminderUse
 import com.drygin.popcornplan.common.domain.search.usecase.ObserveMoviesByIdsUseCase
 import com.drygin.popcornplan.common.domain.search.usecase.SearchMoviesUseCase
 import com.drygin.popcornplan.common.domain.search.usecase.SearchUseCases
-import com.drygin.popcornplan.domain.repository.MovieRepository
-import com.drygin.popcornplan.domain.search.repository.SearchRepository
-import com.drygin.popcornplan.features.details.data.api.MovieDetailsApi
-import com.drygin.popcornplan.features.details.data.reposiroty.DetailsRepositoryImpl
-import com.drygin.popcornplan.features.favorite.repository.FavoriteRepositoryImpl
-import com.drygin.popcornplan.features.home.data.api.MovieApi
-import com.drygin.popcornplan.features.home.data.repository.MovieRepositoryImpl
-import com.drygin.popcornplan.features.reminder.data.repository.ReminderRepositoryImpl
-import com.drygin.popcornplan.features.search.data.api.SearchApi
-import com.drygin.popcornplan.features.search.data.repository.SearchRepositoryImpl
+import com.drygin.popcornplan.data.repository.MovieRepositoryImpl
+import com.drygin.popcornplan.domain.movie.repository.CommonMovieRepository
+import com.drygin.popcornplan.features.search.domain.repository.SearchRepository
+import com.drygin.popcornplan.reatures.details.data.repository.DetailsRepositoryImpl
+import com.drygin.popcornplan.reatures.favorite.data.repository.FavoriteRepositoryImpl
+import com.drygin.popcornplan.reatures.reminder.data.repository.ReminderRepositoryImpl
+import com.drygin.popcornplan.reatures.search.data.repository.SearchRepositoryImpl
+import com.drygin.popcornplan.reatures.trending.data.repository.TrendingMovieSaver
 import org.koin.dsl.module
-import retrofit2.Retrofit
 
 /**
  * Created by Drygin Nikita on 24.07.2025.
  */
 val featureModule = module {
     // Details
-    single<MovieDetailsApi> { get<Retrofit>().create(MovieDetailsApi::class.java) }
     single<DetailsRepository> { DetailsRepositoryImpl(get(), get()) }
     single {
         DetailsUseCases(
@@ -48,7 +44,7 @@ val featureModule = module {
     }
 
     // Favorite
-    single<FavoriteRepository> { FavoriteRepositoryImpl(get()) }
+    single<FavoriteRepository> { FavoriteRepositoryImpl(get(), get()) }
     single {
         FavouriteUseCases(
             toggleFavorite = ToggleFavoriteMovieUseCase(get()),
@@ -57,8 +53,8 @@ val featureModule = module {
     }
 
     // Movies
-    single<MovieApi> { get<Retrofit>().create(MovieApi::class.java) }
-    single<MovieRepository> { MovieRepositoryImpl(get(), get(), get()) }
+    single<TrendingMovieSaver> { TrendingMovieSaver(get()) }
+    single<CommonMovieRepository> { MovieRepositoryImpl(get(), get(), get()) }
     single {
         MovieUseCases(
             getTopTrending = GetTopTrendingMoviesUseCase(get())
@@ -78,7 +74,6 @@ val featureModule = module {
     }
 
     // Search
-    single<SearchApi> { get<Retrofit>().create(SearchApi::class.java) }
     single<SearchRepository> { SearchRepositoryImpl(get(), get(), get()) }
     single {
         SearchUseCases(

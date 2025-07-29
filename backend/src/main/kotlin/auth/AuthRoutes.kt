@@ -1,9 +1,13 @@
 package auth
 
+import com.drygin.popcornplan.features.auth.data.mapper.toDomain
+import com.drygin.popcornplan.features.auth.data.mapper.toDto
+import com.drygin.popcornplan.features.auth.data.remote.dto.LoginRequestDto
+import com.drygin.popcornplan.features.auth.domain.model.Token
 import config.JwtConfig
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
-import io.ktor.server.request.receiveParameters
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
@@ -13,15 +17,16 @@ import io.ktor.server.routing.post
  */
 fun Route.authRoutes() {
     post("/auth/login") {
-        val params = call.receiveParameters()
-        val userId = params["userId"]
+        val request = call.receive<LoginRequestDto>().toDomain()
+        val userName = request.userName
 
-        if (userId.isNullOrBlank() || !AuthService.validateUser(userId)) {
+        if (userName.isBlank() || !AuthService.validateUser(userName)) {
             call.respond(HttpStatusCode.BadRequest, "Missing or invalid userId")
             return@post
         }
 
-        val token = JwtConfig.generateToken(userId)
-        call.respond(mapOf("token" to token))
+        val token = JwtConfig.generateToken(userName)
+        val tokenResponse = Token(token).toDto()
+        call.respond(mapOf("accessToken" to tokenResponse))
     }
 }

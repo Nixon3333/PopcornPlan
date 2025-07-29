@@ -5,9 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
-import com.drygin.popcornplan.common.domain.reminder.usecase.CancelNotificationUseCase
 import com.drygin.popcornplan.common.domain.reminder.usecase.NotificationUseCases
-import com.drygin.popcornplan.common.domain.reminder.usecase.ShowReminderNotificationUseCase
 import org.koin.java.KoinJavaComponent.getKoin
 
 /**

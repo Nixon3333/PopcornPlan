@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.drygin.popcornplan.R
 import com.drygin.popcornplan.common.domain.movie.model.TrendingMovie
-import com.drygin.popcornplan.features.home.SectionTitle
+import com.drygin.popcornplan.features.trending.SectionTitle
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

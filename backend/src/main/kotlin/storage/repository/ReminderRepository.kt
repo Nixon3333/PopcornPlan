@@ -1,11 +1,11 @@
 package storage.repository
 
-import io.ktor.server.application.Application
+import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.domain.SyncEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import model.ReminderDto
-import model.SyncEvent
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -18,14 +18,16 @@ import ws.WebSocketSessionRegistry
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-class ReminderRepository(private val app: Application) {
+class ReminderRepository(private val appScope: CoroutineScope) {
 
     fun getAll(userId: String): List<ReminderDto> = transaction {
         Reminders.selectAll().where { Reminders.userId eq userId }
             .map {
                 ReminderDto(
+                    id = it[Reminders.id],
                     userId = it[Reminders.userId],
                     tmdbId = it[Reminders.tmdbId],
+                    title = it[Reminders.title],
                     type = it[Reminders.type],
                     reminderTime = it[Reminders.reminderTime],
                     createdAt = it[Reminders.createdAt]
@@ -46,7 +48,7 @@ class ReminderRepository(private val app: Application) {
             it[createdAt] = reminder.createdAt
         }
 
-        app.launch {
+        appScope.launch {
             WebSocketSessionRegistry.sendToUser(
                 reminder.userId,
                 Json.encodeToString(SyncEvent.ReminderAdded(reminder))
@@ -54,15 +56,15 @@ class ReminderRepository(private val app: Application) {
         }
     }
 
-    fun delete(userId: String, tmdbId: Int) = transaction {
+    fun delete(userId: String, reminderId: String) = transaction {
         Reminders.deleteWhere {
-            (Reminders.userId eq userId) and (Reminders.tmdbId eq tmdbId)
+            (Reminders.userId eq userId) and (Reminders.id eq reminderId)
         }
 
-        app.launch {
+        appScope.launch {
             WebSocketSessionRegistry.sendToUser(
                 userId,
-                Json.encodeToString(SyncEvent.ReminderRemoved(tmdbId))
+                Json.encodeToString(SyncEvent.ReminderRemoved(reminderId))
             )
         }
     }

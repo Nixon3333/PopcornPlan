@@ -52,7 +52,7 @@ class RemindersScreenViewModel(
             title = movie.title,
             type = "movie",
             description = description,
-            posterUrl = movie.images.poster.firstOrNull(),
+            //posterUrl = movie.images.poster.firstOrNull(),
             reminderTime = reminderTime.atZone(ZoneId.systemDefault()).toInstant()
                 .toEpochMilli(),
             createdAt = timeProvider.currentTimeMillis()

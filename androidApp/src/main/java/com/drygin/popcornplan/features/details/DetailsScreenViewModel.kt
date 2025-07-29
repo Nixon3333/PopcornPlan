@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.drygin.popcornplan.common.domain.details.usecase.DetailsUseCases
-import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
+import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
  */
 class DetailsScreenViewModel(
     private val detailsUseCases: DetailsUseCases,
-    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
+    private val favouriteUseCases: FavouriteUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,7 +39,7 @@ class DetailsScreenViewModel(
 
     fun onToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            toggleFavoriteMovieUseCase(movieId)
+            favouriteUseCases.toggleFavorite(movieId)
         }
     }
 }

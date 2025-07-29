@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.data.mapper.dto
 
 import com.drygin.popcornplan.common.domain.movie.model.Movie
-import com.drygin.popcornplan.data.model.MovieDto
+import com.drygin.popcornplan.data.remote.dto.MovieDto
 
 /**
  * Created by Drygin Nikita on 11.06.2025.

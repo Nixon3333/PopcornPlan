@@ -1,12 +1,11 @@
 package storage.repository
 
-import io.ktor.server.application.Application
-import kotlinx.coroutines.GlobalScope
+import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
+import com.drygin.popcornplan.features.sync.domain.SyncEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import model.FavoriteDto
-import model.SyncEvent
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -20,41 +19,41 @@ import ws.WebSocketSessionRegistry
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-class FavoriteRepository(private val app: Application) {
+class FavoriteRepository(private val appScope: CoroutineScope) {
 
     fun getAll(userId: String): List<FavoriteDto> = transaction {
         Favorites.selectAll().where { Favorites.userId eq userId }
             .map {
                 FavoriteDto(
-                    userId = it[Favorites.userId],
+                    //userId = it[Favorites.userId],
                     tmdbId = it[Favorites.tmdbId],
-                    createdAt = it[Favorites.createdAt]
+                    //createdAt = it[Favorites.createdAt]
                 )
             }
     }
 
-    fun add(favorite: FavoriteDto) = transaction {
+    fun add(userId: String, tmdbId: Int) = transaction {
         val updatedRows = Favorites.update(
             where = {
-                (Favorites.userId eq favorite.userId) and
-                        (Favorites.tmdbId eq favorite.tmdbId)
+                (Favorites.userId eq userId) and
+                        (Favorites.tmdbId eq tmdbId)
             }
         ) {
-            it[createdAt] = favorite.createdAt
+            it[createdAt] = System.currentTimeMillis()
         }
 
         if (updatedRows == 0) {
             Favorites.insert {
-                it[userId] = favorite.userId
-                it[tmdbId] = favorite.tmdbId
-                it[createdAt] = favorite.createdAt
+                it[Favorites.userId] = userId
+                it[Favorites.tmdbId] = tmdbId
+                it[createdAt] = System.currentTimeMillis()
             }
         }
 
-        app.launch {
+        appScope.launch {
             WebSocketSessionRegistry.sendToUser(
-                favorite.userId,
-                Json.encodeToString(SyncEvent.FavoriteAdded(favorite))
+                userId,
+                Json.encodeToString(SyncEvent.FavoriteAdded(tmdbId))
             )
         }
     }
@@ -64,7 +63,7 @@ class FavoriteRepository(private val app: Application) {
             (Favorites.userId eq userId) and (Favorites.tmdbId eq tmdbId)
         }
 
-        app.launch {
+        appScope.launch {
             WebSocketSessionRegistry.sendToUser(
                 userId,
                 Json.encodeToString(SyncEvent.FavoriteRemoved(tmdbId))

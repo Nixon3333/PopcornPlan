@@ -1,4 +1,6 @@
+import auth.authRoutes
 import config.JwtConfig
+import di.mainModule
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -9,8 +11,8 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
-import auth.authRoutes
-import di.mainModule
+import io.ktor.server.websocket.WebSockets
+import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.getKoin
 import org.koin.ktor.plugin.Koin
 import routes.favoriteRoutes
@@ -30,9 +32,10 @@ fun main() {
 }
 
 fun Application.module() {
+    val appScope = this
 
     install(Koin) {
-        modules(mainModule)
+        modules(mainModule(appScope))
     }
 
     val reminderRepository: ReminderRepository = getKoin().get()
@@ -40,8 +43,13 @@ fun Application.module() {
 
     DatabaseFactory.init()
     install(ContentNegotiation) {
-        json()
+        json(Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        })
     }
+
+    install(WebSockets)
 
     install(Authentication) {
         jwt("auth-jwt") {
