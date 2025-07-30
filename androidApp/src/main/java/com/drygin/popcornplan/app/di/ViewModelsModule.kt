@@ -6,7 +6,7 @@ import com.drygin.popcornplan.features.favorite.FavoriteScreenViewModel
 import com.drygin.popcornplan.features.trending.TrendingScreenViewModel
 import com.drygin.popcornplan.features.reminder.RemindersScreenViewModel
 import com.drygin.popcornplan.features.search.SearchScreenViewModel
-import com.drygin.popcornplan.features.sync.SyncWebSocketViewModel
+import com.drygin.popcornplan.features.sync.WebSocketViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -23,9 +23,10 @@ val viewModelsModule = module {
     viewModel { SearchScreenViewModel(get(), get()) }
 
     viewModel {
-        SyncWebSocketViewModel(
+        WebSocketViewModel(
             syncWebSocketClient = get(),
             syncEventHandler = get(),
+            get(),
             get()
         )
     }

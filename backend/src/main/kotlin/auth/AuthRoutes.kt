@@ -27,6 +27,6 @@ fun Route.authRoutes() {
 
         val token = JwtConfig.generateToken(userName)
         val tokenResponse = Token(token).toDto()
-        call.respond(mapOf("accessToken" to tokenResponse))
+        call.respond(tokenResponse)
     }
 }

@@ -52,7 +52,7 @@ import com.drygin.popcornplan.features.favorite.FavoriteScreenContainer
 import com.drygin.popcornplan.features.trending.HomeScreenContainer
 import com.drygin.popcornplan.features.reminder.RemindersScreenContainer
 import com.drygin.popcornplan.features.search.SearchScreenContainer
-import com.drygin.popcornplan.features.sync.SyncWebSocketViewModel
+import com.drygin.popcornplan.features.sync.WebSocketViewModel
 import com.drygin.popcornplan.preview.PreviewMocks
 import com.drygin.popcornplan.preview.home.HomeScreenPreview
 import kotlinx.coroutines.launch
@@ -60,14 +60,14 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private val syncWebSocketViewModel: SyncWebSocketViewModel by viewModel()
+    private val webSocketViewModel: WebSocketViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false) // для прозрачности
         setContent {
             PopcornPlanTheme {
-                val vm = syncWebSocketViewModel
+                val vm = webSocketViewModel
                 PopcornPlan()
             }
         }

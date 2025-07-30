@@ -19,9 +19,9 @@ sealed interface SyncEvent {
 
     @Serializable
     @SerialName("favorite_added")
-    data class FavoriteAdded(val tmdbId: Int) : SyncEvent
+    data class FavoriteAdded(val traktId: Int) : SyncEvent
 
     @Serializable
     @SerialName("favorite_removed")
-    data class FavoriteRemoved(val tmdbId: Int) : SyncEvent
+    data class FavoriteRemoved(val traktId: Int) : SyncEvent
 }

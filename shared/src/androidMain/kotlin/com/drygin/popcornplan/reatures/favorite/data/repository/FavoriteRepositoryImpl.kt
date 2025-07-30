@@ -4,7 +4,7 @@ import com.drygin.popcornplan.common.domain.favorite.repository.FavoriteReposito
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.data.local.dao.MovieDao
 import com.drygin.popcornplan.data.mapper.entity.toDomain
-import com.drygin.popcornplan.features.favorite.data.remote.api.FavoriteApi
+import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,29 +29,23 @@ class FavoriteRepositoryImpl(
         withContext(Dispatchers.IO) {
             val localMovie = movieDao.getMovie(movieId)
             localMovie?.let {
-                movieDao.upsert(it.copy(favorite = !it.favorite))
+                val newIsFavorite = !it.favorite
+                setFavorite(movieId, newIsFavorite)
             }
-            favoriteApi.syncInsertFavorite(movieId) // Тут неправильный Id!!
         }
     }
 
-    override suspend fun insert(tmdbId: Int) {
+    override suspend fun setFavorite(movieId: Int, isFavorite: Boolean) {
         withContext(Dispatchers.IO) {
-            val existing = movieDao.getMovie(tmdbId)
-            if (existing != null) {
-                movieDao.upsert(existing.copy(favorite = true))
+            val localMovie = movieDao.getMovie(movieId)
+            localMovie?.let {
+                movieDao.upsert(it.copy(favorite = isFavorite))
             }
-            favoriteApi.syncInsertFavorite(tmdbId)
-        }
-    }
 
-    override suspend fun delete(tmdbId: Int) {
-        withContext(Dispatchers.IO) {
-            val existing = movieDao.getMovie(tmdbId)
-            if (existing != null) {
-                movieDao.upsert(existing.copy(favorite = false))
-            }
-            favoriteApi.syncDeleteFavorite(tmdbId)
+            if (isFavorite)
+                favoriteApi.syncInsertFavorite(movieId)
+            else
+                favoriteApi.syncDeleteFavorite(movieId)
         }
     }
 }

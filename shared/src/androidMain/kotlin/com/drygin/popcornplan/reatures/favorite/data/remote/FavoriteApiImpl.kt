@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.reatures.favorite.data.remote
 
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
-import com.drygin.popcornplan.features.favorite.data.remote.api.FavoriteApi
+import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
 import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
 import com.drygin.popcornplan.network.BaseServerApi
 import io.ktor.client.HttpClient
@@ -19,16 +19,16 @@ class FavoriteApiImpl(
     tokenRepository: TokenRepository
 ) : BaseServerApi(client, tokenRepository), FavoriteApi {
 
-    override suspend fun syncInsertFavorite(tmdbId: Int) {
+    override suspend fun syncInsertFavorite(traktId: Int) {
         client.post("/favorites") {
             contentType(ContentType.Application.Json)
             authHeader()
-            setBody(FavoriteDto(tmdbId))
+            setBody(FavoriteDto(traktId))
         }
     }
 
-    override suspend fun syncDeleteFavorite(tmdbId: Int) {
-        client.delete("/favorites/$tmdbId") {
+    override suspend fun syncDeleteFavorite(traktId: Int) {
+        client.delete("/favorites/$traktId") {
             authHeader()
         }
     }

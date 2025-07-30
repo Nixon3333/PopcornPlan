@@ -1,13 +1,18 @@
 package com.drygin.popcornplan.di
 
 import com.drygin.popcornplan.features.details.data.remote.api.MovieDetailsApi
-import com.drygin.popcornplan.features.favorite.data.remote.api.FavoriteApi
+import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
 import com.drygin.popcornplan.features.search.data.remote.api.SearchApi
+import com.drygin.popcornplan.features.sync.domain.remote.api.SyncApi
+import com.drygin.popcornplan.features.sync.domain.repository.SyncRepository
+import com.drygin.popcornplan.features.sync.domain.usecase.SyncUseCase
 import com.drygin.popcornplan.features.trending.data.remote.api.MovieApi
 import com.drygin.popcornplan.network.HttpClientProvider
 import com.drygin.popcornplan.network.ServerHttpClientProvider
 import com.drygin.popcornplan.network.TraktApiHttpClientProvider
 import com.drygin.popcornplan.reatures.favorite.data.remote.FavoriteApiImpl
+import com.drygin.popcornplan.reatures.sync.data.remote.api.SyncApiImpl
+import com.drygin.popcornplan.reatures.sync.data.repository.SyncRepositoryImpl
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -50,4 +55,14 @@ val networkModule = module {
             tokenRepository = get()
         )
     }
+
+    single<SyncApi> {
+        SyncApiImpl(
+            client = get<HttpClientProvider>(named("server")).getClient(),
+            tokenRepository = get()
+        )
+    }
+
+    single { SyncUseCase(get()) }
+    single<SyncRepository> { SyncRepositoryImpl(get()) }
 }

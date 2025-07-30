@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
  */
 interface FavoriteRepository {
     suspend fun getFavoriteMovies(): Flow<List<Movie>>
-    suspend fun onToggleFavorite(movieId: Int)
-    suspend fun insert(tmdbId: Int)
-    suspend fun delete(tmdbId: Int)
+    suspend fun onToggleFavorite(traktId: Int)
+    suspend fun setFavorite(traktId: Int, isFavorite: Boolean)
 }

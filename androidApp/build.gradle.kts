@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 2
-        versionName = "1.3.1"
+        versionName = "1.3.1.1"
 
         applicationVariants.all {
             outputs.all {

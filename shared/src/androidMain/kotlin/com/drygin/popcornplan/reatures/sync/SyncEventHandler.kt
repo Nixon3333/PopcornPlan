@@ -13,8 +13,8 @@ class SyncEventHandler(
 ) {
     suspend fun handle(event: SyncEvent) {
         when (event) {
-            is SyncEvent.FavoriteAdded -> favoriteRepository.insert(event.tmdbId)
-            is SyncEvent.FavoriteRemoved -> favoriteRepository.delete(event.tmdbId)
+            is SyncEvent.FavoriteAdded -> favoriteRepository.setFavorite(event.traktId, true)
+            is SyncEvent.FavoriteRemoved -> favoriteRepository.setFavorite(event.traktId, false)
             is SyncEvent.ReminderAdded -> reminderRepository.insert(event.reminder)
             is SyncEvent.ReminderRemoved -> reminderRepository.deleteReminder(event.reminderId)
         }
