@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.network
+package com.drygin.popcornplan.network.api
 
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
 import io.ktor.client.HttpClient

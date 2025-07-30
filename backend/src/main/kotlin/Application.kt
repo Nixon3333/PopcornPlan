@@ -15,12 +15,14 @@ import io.ktor.server.websocket.WebSockets
 import kotlinx.serialization.json.Json
 import org.koin.ktor.ext.getKoin
 import org.koin.ktor.plugin.Koin
+import plugins.configureErrorHandling
 import routes.favoriteRoutes
 import routes.reminderRoutes
 import routes.syncRoutes
+import service.FavoriteService
+import service.ReminderService
+import service.SyncService
 import storage.DatabaseFactory
-import storage.repository.FavoriteRepository
-import storage.repository.ReminderRepository
 import ws.syncWebSocketRoute
 
 /**
@@ -38,10 +40,13 @@ fun Application.module() {
         modules(mainModule(appScope))
     }
 
-    val reminderRepository: ReminderRepository = getKoin().get()
-    val favoriteRepository: FavoriteRepository = getKoin().get()
+    val reminderService: ReminderService = getKoin().get()
+    val favoriteService: FavoriteService = getKoin().get()
+    val syncService: SyncService = getKoin().get()
 
     DatabaseFactory.init()
+    configureErrorHandling()
+
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -61,9 +66,9 @@ fun Application.module() {
         authRoutes()
         authenticate("auth-jwt") {
             syncWebSocketRoute()
-            favoriteRoutes(favoriteRepository)
-            reminderRoutes(reminderRepository)
-            syncRoutes(reminderRepository, favoriteRepository)
+            favoriteRoutes(favoriteService)
+            reminderRoutes(reminderService)
+            syncRoutes(syncService)
         }
     }
 }

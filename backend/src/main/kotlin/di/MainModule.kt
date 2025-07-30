@@ -2,6 +2,9 @@ package di
 
 import kotlinx.coroutines.CoroutineScope
 import org.koin.dsl.module
+import service.FavoriteService
+import service.ReminderService
+import service.SyncService
 import storage.repository.FavoriteRepository
 import storage.repository.ReminderRepository
 
@@ -10,6 +13,21 @@ import storage.repository.ReminderRepository
  */
 fun mainModule(appScope: CoroutineScope) = module {
     single { appScope }
-    single { ReminderRepository(get()) }
-    single { FavoriteRepository(get()) }
+    single { ReminderRepository() }
+    single { FavoriteRepository() }
+    single {
+        FavoriteService(
+            repository = get(),
+            wsRegistry = get(),
+            appScope = get()
+        )
+    }
+    single {
+        ReminderService(
+            repository = get(),
+            wsRegistry = get(),
+            appScope = get()
+        )
+    }
+    single { SyncService(get(), get()) }
 }

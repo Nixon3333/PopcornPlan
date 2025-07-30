@@ -1,35 +1,22 @@
 package routes
 
-import com.drygin.popcornplan.features.sync.data.remote.dto.SyncResponseDto
 import config.UserPrincipal
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import storage.repository.FavoriteRepository
-import storage.repository.ReminderRepository
+import service.SyncService
 
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-fun Route.syncRoutes(
-    reminderRepository: ReminderRepository,
-    favoriteRepository: FavoriteRepository
-) {
+fun Route.syncRoutes(syncService: SyncService) {
     get("/sync") {
         val userId = call.principal<UserPrincipal>()?.userId
-        if (userId == null) {
-            call.respond(HttpStatusCode.BadRequest)
-            return@get
-        }
+            ?: throw IllegalArgumentException("Missing or invalid user")
 
-        call.respond(
-            SyncResponseDto(
-                favorites = favoriteRepository.getAll(userId),
-                reminders = reminderRepository.getAll(userId)
-            )
-        )
+        val result = syncService.getSyncData(userId)
+        call.respond(result)
     }
 }

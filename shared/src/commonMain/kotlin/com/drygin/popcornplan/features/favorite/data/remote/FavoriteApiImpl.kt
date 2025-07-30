@@ -1,9 +1,9 @@
-package com.drygin.popcornplan.reatures.favorite.data.remote
+package com.drygin.popcornplan.features.favorite.data.remote
 
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
-import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
 import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
-import com.drygin.popcornplan.network.BaseServerApi
+import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
+import com.drygin.popcornplan.network.api.BaseServerApi
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.post

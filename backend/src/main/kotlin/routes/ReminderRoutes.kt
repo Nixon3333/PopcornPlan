@@ -12,40 +12,34 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import storage.repository.ReminderRepository
+import service.ReminderService
 
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
-fun Route.reminderRoutes(
-    reminderRepository: ReminderRepository
-) {
+fun Route.reminderRoutes(reminderService: ReminderService) {
     route("/reminders") {
         get {
             val userId = call.principal<UserPrincipal>()?.userId
-            if (userId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-            call.respond(reminderRepository.getAll(userId))
+                ?: return@get call.respond(HttpStatusCode.Unauthorized)
+
+            call.respond(reminderService.getAll(userId))
         }
 
         post {
             val reminderDto = call.receive<ReminderDto>()
-            reminderRepository.add(reminderDto)
+            reminderService.add(reminderDto)
             call.respond(HttpStatusCode.Created)
         }
 
         delete("/{reminderId}") {
-            val reminderId = call.parameters["reminderId"]
             val userId = call.principal<UserPrincipal>()?.userId
+                ?: return@delete call.respond(HttpStatusCode.Unauthorized)
+            val reminderId = call.parameters["reminderId"]
+                ?: throw IllegalArgumentException("Missing reminderId")
 
-            if (reminderId != null && userId != null) {
-                reminderRepository.delete(userId, reminderId)
-                call.respond(HttpStatusCode.OK)
-            } else {
-                call.respond(HttpStatusCode.BadRequest)
-            }
+            reminderService.delete(userId, reminderId)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

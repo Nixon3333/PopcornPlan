@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.reatures.sync.data.repository
+package com.drygin.popcornplan.features.sync.data.repository
 
 import com.drygin.popcornplan.features.sync.domain.remote.api.SyncApi
 import com.drygin.popcornplan.features.sync.domain.repository.SyncRepository
@@ -12,5 +12,6 @@ class SyncRepositoryImpl(
     override suspend fun getInitialSync() {
         val syncResponseDto = syncApi.getInitialSync()
         println("QWEQWE syncResponseDto = ${syncResponseDto.favorites.joinToString("::")}")
+        // Добавить парсинг
     }
 }

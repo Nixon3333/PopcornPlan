@@ -24,7 +24,7 @@ val viewModelsModule = module {
 
     viewModel {
         WebSocketViewModel(
-            syncWebSocketClient = get(),
+            webSocketClient = get(),
             syncEventHandler = get(),
             get(),
             get()

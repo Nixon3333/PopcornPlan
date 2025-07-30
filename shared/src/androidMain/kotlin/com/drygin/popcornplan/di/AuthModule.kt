@@ -6,7 +6,7 @@ import com.drygin.popcornplan.features.auth.domain.provider.TokenProvider
 import com.drygin.popcornplan.features.auth.domain.repository.AuthRepository
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
 import com.drygin.popcornplan.features.auth.domain.usecase.LoginUseCase
-import com.drygin.popcornplan.network.HttpClientProvider
+import com.drygin.popcornplan.network.api.HttpClientProvider
 import com.drygin.popcornplan.reatures.auth.data.provider.AndroidTokenProviderImpl
 import com.drygin.popcornplan.reatures.auth.data.repository.AndroidTokenRepositoryImpl
 import org.koin.android.ext.koin.androidContext

@@ -12,23 +12,20 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import storage.repository.FavoriteRepository
+import service.FavoriteService
 
 /**
  * Created by Drygin Nikita on 25.07.2025.
  */
 fun Route.favoriteRoutes(
-    favoriteRepository: FavoriteRepository
+    favoriteService: FavoriteService
 ) {
     route("/favorites") {
         get {
             val userId = call.principal<UserPrincipal>()?.userId
-            if (userId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
+                ?: return@get call.respond(HttpStatusCode.Unauthorized)
 
-            call.respond(favoriteRepository.getAll(userId))
+            call.respond(favoriteService.getAll(userId))
         }
 
         post {
@@ -36,19 +33,18 @@ fun Route.favoriteRoutes(
                 ?: return@post call.respond(HttpStatusCode.Unauthorized)
 
             val favoriteDTO = call.receive<FavoriteDto>()
-            favoriteRepository.add(userId, favoriteDTO.tmdbId)
+            favoriteService.add(userId, favoriteDTO.tmdbId)
             call.respond(HttpStatusCode.Created)
         }
 
         delete("/{tmdbId}") {
-            val tmdbId = call.parameters["tmdbId"]?.toIntOrNull()
             val userId = call.principal<UserPrincipal>()?.userId
-            if (userId == null || tmdbId == null) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@delete
-            }
+                ?: return@delete call.respond(HttpStatusCode.Unauthorized)
 
-            favoriteRepository.delete(userId, tmdbId)
+            val tmdbId = call.parameters["tmdbId"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Missing or invalid tmdbId")
+
+            favoriteService.delete(userId, tmdbId)
             call.respond(HttpStatusCode.OK)
         }
     }

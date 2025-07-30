@@ -1,8 +1,7 @@
-package com.drygin.popcornplan.reatures.sync
+package com.drygin.popcornplan.network.websocket
 
 import com.drygin.popcornplan.common.domain.favorite.repository.FavoriteRepository
 import com.drygin.popcornplan.common.domain.reminder.repository.ReminderRepository
-import com.drygin.popcornplan.features.sync.domain.SyncEvent
 
 /**
  * Created by Drygin Nikita on 28.07.2025.

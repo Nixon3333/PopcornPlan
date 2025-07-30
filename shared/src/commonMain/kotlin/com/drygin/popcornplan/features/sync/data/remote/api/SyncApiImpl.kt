@@ -1,9 +1,9 @@
-package com.drygin.popcornplan.reatures.sync.data.remote.api
+package com.drygin.popcornplan.features.sync.data.remote.api
 
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
 import com.drygin.popcornplan.features.sync.data.remote.dto.SyncResponseDto
 import com.drygin.popcornplan.features.sync.domain.remote.api.SyncApi
-import com.drygin.popcornplan.network.BaseServerApi
+import com.drygin.popcornplan.network.api.BaseServerApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

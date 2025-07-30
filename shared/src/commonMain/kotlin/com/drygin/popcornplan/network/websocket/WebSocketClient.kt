@@ -1,8 +1,7 @@
-package com.drygin.popcornplan.data.remote
+package com.drygin.popcornplan.network.websocket
 
 import com.drygin.popcornplan.features.auth.domain.provider.TokenProvider
-import com.drygin.popcornplan.features.sync.domain.SyncEvent
-import com.drygin.popcornplan.network.HttpClientProvider
+import com.drygin.popcornplan.network.api.HttpClientProvider
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.headers
 import io.ktor.websocket.Frame
@@ -12,7 +11,7 @@ import kotlinx.serialization.json.Json
 /**
  * Created by Drygin Nikita on 28.07.2025.
  */
-class SyncWebSocketClient(
+class WebSocketClient(
     private val clientProvider: HttpClientProvider,
     private val json: Json,
     private val tokenProvider: TokenProvider,

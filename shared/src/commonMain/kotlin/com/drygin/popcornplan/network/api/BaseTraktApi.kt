@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.network
+package com.drygin.popcornplan.network.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
