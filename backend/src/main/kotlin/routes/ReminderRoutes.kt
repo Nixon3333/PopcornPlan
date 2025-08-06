@@ -1,6 +1,6 @@
 package routes
 
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import config.UserPrincipal
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call

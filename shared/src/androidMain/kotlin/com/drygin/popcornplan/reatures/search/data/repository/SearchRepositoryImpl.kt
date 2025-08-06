@@ -3,7 +3,6 @@ package com.drygin.popcornplan.reatures.search.data.repository
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.data.local.dao.ImageDao
 import com.drygin.popcornplan.data.local.dao.MovieDao
-import com.drygin.popcornplan.data.local.utils.saveMoviesPreservingFavorites
 import com.drygin.popcornplan.data.mapper.entity.toDomain
 import com.drygin.popcornplan.data.mapper.entity.toEntities
 import com.drygin.popcornplan.data.mapper.entity.toEntity
@@ -26,7 +25,7 @@ class SearchRepositoryImpl(
         val movieDtoList = dtoList.map { it.movie }
         val entities = movieDtoList.map { it.toEntity() }
 
-        movieDao.saveMoviesPreservingFavorites(entities)
+        movieDao.insertAll(entities)
         movieDtoList.forEach { movieDto ->
             val imageEntities = movieDto.images.toEntities(movieDto.ids.trakt)
             imageDao.insertAll(imageEntities)

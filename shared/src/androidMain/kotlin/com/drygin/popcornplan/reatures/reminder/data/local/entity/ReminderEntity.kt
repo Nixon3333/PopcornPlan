@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "reminders")
 data class ReminderEntity(
     @PrimaryKey val id: String,
-    val tmdbId: Int,
+    val traktId: Int,
     val title: String,
     val type: String,
     val description: String,

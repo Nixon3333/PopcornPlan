@@ -1,9 +1,9 @@
 package com.drygin.popcornplan.di
 
 import com.drygin.popcornplan.features.details.data.remote.api.MovieDetailsApi
-import com.drygin.popcornplan.features.favorite.data.remote.FavoriteApiImpl
-import com.drygin.popcornplan.features.favorite.domain.remote.FavoriteApi
 import com.drygin.popcornplan.features.search.data.remote.api.SearchApi
+import com.drygin.popcornplan.features.sync.data.remote.api.FavoriteSyncApi
+import com.drygin.popcornplan.features.sync.data.remote.api.FavoriteSyncApiImpl
 import com.drygin.popcornplan.features.sync.data.remote.api.SyncApiImpl
 import com.drygin.popcornplan.features.sync.data.repository.SyncRepositoryImpl
 import com.drygin.popcornplan.features.sync.domain.remote.api.SyncApi
@@ -49,8 +49,8 @@ val networkModule = module {
         SearchApi(clientProvider, apiKey)
     }
 
-    single<FavoriteApi> {
-        FavoriteApiImpl(
+    single<FavoriteSyncApi> {
+        FavoriteSyncApiImpl(
             client = get<HttpClientProvider>(named("server")).getClient(),
             tokenRepository = get()
         )
@@ -64,5 +64,5 @@ val networkModule = module {
     }
 
     single { SyncUseCase(get()) }
-    single<SyncRepository> { SyncRepositoryImpl(get()) }
+    single<SyncRepository> { SyncRepositoryImpl(get(), get()) }
 }

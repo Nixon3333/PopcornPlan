@@ -1,6 +1,6 @@
 package service
 
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import com.drygin.popcornplan.network.websocket.SyncEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -13,7 +13,6 @@ import ws.WebSocketSessionRegistry
  */
 class ReminderService(
     private val repository: ReminderRepository,
-    private val wsRegistry: WebSocketSessionRegistry,
     private val appScope: CoroutineScope
 ) {
     fun getAll(userId: String): List<ReminderDto> {
@@ -24,7 +23,7 @@ class ReminderService(
         repository.upsert(reminder)
 
         appScope.launch {
-            wsRegistry.sendToUser(
+            WebSocketSessionRegistry.sendToUser(
                 reminder.userId,
                 Json.encodeToString(
                     SyncEvent.serializer(),
@@ -38,7 +37,7 @@ class ReminderService(
         repository.delete(userId, reminderId)
 
         appScope.launch {
-            wsRegistry.sendToUser(
+            WebSocketSessionRegistry.sendToUser(
                 userId,
                 Json.encodeToString(
                     SyncEvent.serializer(),

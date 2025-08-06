@@ -8,6 +8,7 @@ import com.drygin.popcornplan.di.authModule
 import com.drygin.popcornplan.di.databaseModule
 import com.drygin.popcornplan.di.featureModule
 import com.drygin.popcornplan.di.networkModule
+import com.drygin.popcornplan.di.syncDataModule
 import com.drygin.popcornplan.di.websocketModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
@@ -29,7 +30,8 @@ class PopcornPlanApp : Application() {
                 viewModelsModule,
                 authModule,
                 networkModule,
-                websocketModule
+                websocketModule,
+                syncDataModule
             )
         }
     }

@@ -1,6 +1,6 @@
 package com.drygin.popcornplan.network.websocket
 
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

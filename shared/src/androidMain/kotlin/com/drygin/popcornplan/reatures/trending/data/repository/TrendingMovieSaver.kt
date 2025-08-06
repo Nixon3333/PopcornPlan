@@ -2,7 +2,6 @@ package com.drygin.popcornplan.reatures.trending.data.repository
 
 import androidx.room.withTransaction
 import com.drygin.popcornplan.data.local.AppDatabase
-import com.drygin.popcornplan.data.local.utils.saveMoviesPreservingFavorites
 import com.drygin.popcornplan.data.mapper.entity.toEntities
 import com.drygin.popcornplan.data.mapper.entity.toEntity
 import com.drygin.popcornplan.features.trending.data.remote.dto.TrendingMovieDto
@@ -33,7 +32,7 @@ class TrendingMovieSaver(
 
 
         val entities = moviesDto.map { it.toEntity() }
-        movieDao.saveMoviesPreservingFavorites(entities)
+        movieDao.insertAll(entities)
 
         trendingDao.insertAll(trendingMovies.map { it.toEntity() })
 

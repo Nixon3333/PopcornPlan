@@ -1,6 +1,6 @@
 package storage.repository
 
-import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.FavoriteDto
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -18,7 +18,7 @@ class FavoriteRepository {
         Favorites.selectAll().where { Favorites.userId eq userId }
             .map {
                 FavoriteDto(
-                    tmdbId = it[Favorites.traktId]
+                    traktId = it[Favorites.traktId]
                 )
             }
     }

@@ -21,7 +21,7 @@ class FavoriteScreenViewModel(
     init {
         viewModelScope.launch {
             favouriteUseCases.getFavourite().collect {
-                _movies.value = it
+                _movies.value = it.map { movie -> movie.copy(isFavorite = true) }
             }
         }
     }

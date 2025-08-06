@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.features.favorite.data.remote.dto
+package com.drygin.popcornplan.features.sync.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FavoriteDto(
     //val userId: String,
-    val tmdbId: Int,
+    val traktId: Int,
     //val title: String,
     //val type: String, // "movie" or "tv"
     //val posterUrl: String?,

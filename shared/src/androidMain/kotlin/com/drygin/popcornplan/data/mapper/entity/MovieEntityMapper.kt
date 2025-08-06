@@ -13,7 +13,6 @@ fun MovieEntity.toDomain(images: List<ImageEntity>): Movie = Movie(
     ids = Ids(traktId),
     title = title,
     year = year,
-    isFavorite = favorite,
     overview = overview,
     images = images.toDomain()
 )
@@ -22,7 +21,6 @@ fun MovieEntity.toDomain(): Movie = Movie(
     ids = Ids(traktId),
     title = title,
     year = year,
-    isFavorite = favorite,
     overview = overview
 )
 

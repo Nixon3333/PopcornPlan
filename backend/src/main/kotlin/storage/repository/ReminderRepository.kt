@@ -1,6 +1,6 @@
 package storage.repository
 
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
@@ -20,7 +20,7 @@ class ReminderRepository {
                 ReminderDto(
                     id = it[Reminders.id],
                     userId = it[Reminders.userId],
-                    tmdbId = it[Reminders.tmdbId],
+                    traktId = it[Reminders.traktId],
                     title = it[Reminders.title],
                     type = it[Reminders.type],
                     reminderTime = it[Reminders.reminderTime],
@@ -31,13 +31,13 @@ class ReminderRepository {
 
     fun upsert(reminder: ReminderDto) = transaction {
         Reminders.deleteWhere {
-            (Reminders.userId eq reminder.userId) and (Reminders.tmdbId eq reminder.tmdbId)
+            (Reminders.userId eq reminder.userId) and (Reminders.traktId eq reminder.traktId)
         }
 
         Reminders.insert {
             it[id] = reminder.id
             it[userId] = reminder.userId
-            it[tmdbId] = reminder.tmdbId
+            it[traktId] = reminder.traktId
             it[title] = reminder.title
             it[type] = reminder.type
             it[reminderTime] = reminder.reminderTime

@@ -18,14 +18,12 @@ fun mainModule(appScope: CoroutineScope) = module {
     single {
         FavoriteService(
             repository = get(),
-            wsRegistry = get(),
             appScope = get()
         )
     }
     single {
         ReminderService(
             repository = get(),
-            wsRegistry = get(),
             appScope = get()
         )
     }

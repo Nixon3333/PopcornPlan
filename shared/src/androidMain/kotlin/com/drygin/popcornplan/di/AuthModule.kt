@@ -23,5 +23,5 @@ val authModule = module {
     single<TokenProvider> { AndroidTokenProviderImpl(get()) }
 
     single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
-    single { LoginUseCase(get()) }
+    single(createdAtStart = true) { LoginUseCase(get()) }
 }

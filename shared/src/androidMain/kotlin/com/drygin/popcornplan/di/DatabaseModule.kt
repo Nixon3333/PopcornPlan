@@ -22,4 +22,5 @@ val databaseModule = module {
     single { get<AppDatabase>().reminderDao() }
     single { get<AppDatabase>().imageDao() }
     single { get<AppDatabase>().trendingDao() }
+    single { get<AppDatabase>().favoriteDao() }
 }

@@ -48,4 +48,11 @@ class MovieApi(
             parameter("extended", "images")
         }.body()
     }
+
+    suspend fun getMovie(traktId: Int): MovieDto? {
+        return client.get("movies/$traktId") {
+            traktHeaders()
+            parameter("extended", "full,images")
+        }.body()
+    }
 }

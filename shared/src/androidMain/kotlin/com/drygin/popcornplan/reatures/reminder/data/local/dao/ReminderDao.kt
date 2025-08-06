@@ -18,9 +18,15 @@ interface ReminderDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(reminder: ReminderEntity)
 
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insertAll(remindersList: List<ReminderEntity>)
+
     @Query("DELETE FROM reminders WHERE id = :id")
     suspend fun delete(id: String)
 
     @Query("SELECT * FROM reminders WHERE id = :id LIMIT 1")
     suspend fun get(id: String): ReminderEntity?
+
+    @Query("DELETE FROM reminders")
+    suspend fun clearAll()
 }

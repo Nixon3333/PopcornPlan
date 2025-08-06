@@ -1,5 +1,7 @@
 package com.drygin.popcornplan.features.sync.data.remote.api
 
+import com.drygin.popcornplan.data.remote.safeApiCall
+import com.drygin.popcornplan.domain.util.ApiResult
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
 import com.drygin.popcornplan.features.sync.data.remote.dto.SyncResponseDto
 import com.drygin.popcornplan.features.sync.domain.remote.api.SyncApi

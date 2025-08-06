@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.Table
  */
 object Reminders : Table("reminders") {
     val id = varchar("id", 36)
-    val tmdbId = integer("tmdb_id")
+    val traktId = integer("trakt_id")
     val userId = varchar("user_id", 50)
     val title = varchar("title", 50)
     val type = varchar("type", 10)

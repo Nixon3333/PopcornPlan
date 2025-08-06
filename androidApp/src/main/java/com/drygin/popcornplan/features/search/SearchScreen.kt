@@ -45,12 +45,17 @@ fun SearchScreenContainer(
     onMovieClick: (Int) -> Unit
 ) {
     val movies by viewModel.movies.collectAsState()
+    val favoriteIds by viewModel.favorites.collectAsState()
     val query by viewModel.query.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val onQueryChanged = viewModel::onQueryChanged
 
+    val uiMovies = remember(movies, favoriteIds) {
+        movies.map { movie -> movie.copy(isFavorite = favoriteIds.contains(movie.ids.trakt)) }
+    }
+
     SearchScreen(
-        movies,
+        uiMovies,
         query,
         isLoading,
         onQueryChanged = onQueryChanged,

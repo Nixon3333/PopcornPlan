@@ -2,7 +2,7 @@ package com.drygin.popcornplan.features.reminder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.drygin.popcornplan.common.domain.favorite.repository.FavoriteRepository
+import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.common.domain.reminder.model.Reminder
 import com.drygin.popcornplan.common.domain.reminder.usecase.ReminderUseCases
@@ -19,7 +19,7 @@ import java.util.UUID
  */
 class RemindersScreenViewModel(
     private val reminderUseCases: ReminderUseCases,
-    private val favoriteRepository: FavoriteRepository,
+    private val favoriteUseCases: FavouriteUseCases,
     private val timeProvider: TimeProvider
 ) : ViewModel() {
 
@@ -38,7 +38,7 @@ class RemindersScreenViewModel(
                     }
             }
             launch {
-                favoriteRepository.getFavoriteMovies().collect {
+                favoriteUseCases.getFavourite().collect {
                     _movies.value = it
                 }
             }

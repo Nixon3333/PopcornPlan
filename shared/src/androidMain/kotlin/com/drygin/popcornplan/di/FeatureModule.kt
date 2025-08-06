@@ -5,8 +5,11 @@ import com.drygin.popcornplan.common.domain.details.usecase.DetailsUseCases
 import com.drygin.popcornplan.common.domain.details.usecase.ObserveMovieDetailsUseCase
 import com.drygin.popcornplan.common.domain.details.usecase.RefreshMovieDetailsUseCase
 import com.drygin.popcornplan.common.domain.favorite.repository.FavoriteRepository
+import com.drygin.popcornplan.common.domain.favorite.usecase.ExistUseCase
 import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
 import com.drygin.popcornplan.common.domain.favorite.usecase.GetFavoriteMoviesUseCase
+import com.drygin.popcornplan.common.domain.favorite.usecase.SyncDeleteFavoriteUseCase
+import com.drygin.popcornplan.common.domain.favorite.usecase.SyncInsertFavoriteUseCase
 import com.drygin.popcornplan.common.domain.favorite.usecase.ToggleFavoriteMovieUseCase
 import com.drygin.popcornplan.common.domain.movie.usecase.GetTopTrendingMoviesUseCase
 import com.drygin.popcornplan.common.domain.movie.usecase.MovieUseCases
@@ -44,11 +47,21 @@ val featureModule = module {
     }
 
     // Favorite
-    single<FavoriteRepository> { FavoriteRepositoryImpl(get(), get()) }
+    single<FavoriteRepository> {
+        FavoriteRepositoryImpl(
+            movieDao = get(),
+            movieApi = get(),
+            favoriteDao = get(),
+            favoriteSyncApi = get()
+        )
+    }
     single {
         FavouriteUseCases(
             toggleFavorite = ToggleFavoriteMovieUseCase(get()),
-            getFavourite = GetFavoriteMoviesUseCase(get())
+            getFavourite = GetFavoriteMoviesUseCase(get()),
+            syncInsertFavorite = SyncInsertFavoriteUseCase(get()),
+            syncDeleteFavorite = SyncDeleteFavoriteUseCase(get()),
+            existUseCase = ExistUseCase(get())
         )
     }
 

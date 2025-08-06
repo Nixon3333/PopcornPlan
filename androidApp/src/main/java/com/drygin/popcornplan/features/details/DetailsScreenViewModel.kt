@@ -8,6 +8,7 @@ import com.drygin.popcornplan.common.domain.favorite.usecase.FavouriteUseCases
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
@@ -26,10 +27,14 @@ class DetailsScreenViewModel(
 
     init {
         viewModelScope.launch {
-            detailsUseCases.observeMovieDetails(movieId)
-                .collect {
-                    _movie.value = it
-                }
+            combine(
+                detailsUseCases.observeMovieDetails(movieId),
+                favouriteUseCases.existUseCase(movieId)
+            ) { movie, isFavorite ->
+                movie.copy(isFavorite = isFavorite)
+            }.collect {
+                _movie.value = it
+            }
         }
 
         viewModelScope.launch {

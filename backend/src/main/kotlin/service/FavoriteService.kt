@@ -1,6 +1,6 @@
 package service
 
-import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.FavoriteDto
 import com.drygin.popcornplan.network.websocket.SyncEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -13,7 +13,6 @@ import ws.WebSocketSessionRegistry
  */
 class FavoriteService(
     private val repository: FavoriteRepository,
-    private val wsRegistry: WebSocketSessionRegistry,
     private val appScope: CoroutineScope
 ) {
 
@@ -25,7 +24,7 @@ class FavoriteService(
         repository.upsert(userId, tmdbId)
 
         appScope.launch {
-            wsRegistry.sendToUser(
+            WebSocketSessionRegistry.sendToUser(
                 userId,
                 Json.encodeToString(
                     SyncEvent.serializer(),
@@ -39,7 +38,7 @@ class FavoriteService(
         repository.delete(userId, tmdbId)
 
         appScope.launch {
-            wsRegistry.sendToUser(
+            WebSocketSessionRegistry.sendToUser(
                 userId,
                 Json.encodeToString(
                     SyncEvent.serializer(),

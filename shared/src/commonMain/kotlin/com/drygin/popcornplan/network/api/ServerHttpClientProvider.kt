@@ -2,6 +2,7 @@ package com.drygin.popcornplan.network.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.websocket.WebSockets
@@ -24,9 +25,16 @@ class ServerHttpClientProvider(
 
             install(WebSockets)
 
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15_000
+                connectTimeoutMillis = 10_000
+                socketTimeoutMillis = 15_000
+            }
+
             defaultRequest {
                 url {
                     host = "10.0.2.2" // для Android-эмулятора
+                    //host = "192.168.0.97"
                     port = 8080
                     protocol = URLProtocol.HTTP
                 }

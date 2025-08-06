@@ -2,7 +2,7 @@ package com.drygin.popcornplan.reatures.reminder.data.repository
 
 import com.drygin.popcornplan.common.domain.reminder.model.Reminder
 import com.drygin.popcornplan.common.domain.reminder.repository.ReminderRepository
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import com.drygin.popcornplan.reatures.reminder.data.local.dao.ReminderDao
 import com.drygin.popcornplan.reatures.reminder.data.mapper.toDomain
 import com.drygin.popcornplan.reatures.reminder.data.mapper.toEntity

@@ -4,7 +4,6 @@ import android.util.Log
 import com.drygin.popcornplan.common.domain.details.repository.DetailsRepository
 import com.drygin.popcornplan.common.domain.movie.model.Movie
 import com.drygin.popcornplan.data.local.dao.MovieDao
-import com.drygin.popcornplan.data.local.utils.saveMoviesPreservingFavorites
 import com.drygin.popcornplan.data.mapper.entity.toDomain
 import com.drygin.popcornplan.data.mapper.entity.toEntity
 import com.drygin.popcornplan.features.details.data.remote.api.MovieDetailsApi
@@ -39,7 +38,7 @@ class DetailsRepositoryImpl(
                 try {
                     val remoteMovieDto = api.getMovieDetails(movieId)
                     val movieEntity = remoteMovieDto.toEntity()
-                    movieDao.saveMoviesPreservingFavorites(listOf(movieEntity))
+                    movieDao.insertAll(listOf(movieEntity))
                 } catch (e: Exception) {
                     Log.e(TAG, "refreshMovieDetails error: ${e.stackTraceToString()}")
                 }

@@ -1,7 +1,7 @@
 package com.drygin.popcornplan.common.domain.reminder.repository
 
 import com.drygin.popcornplan.common.domain.reminder.model.Reminder
-import com.drygin.popcornplan.features.reminder.data.remote.dto.ReminderDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.ReminderDto
 import kotlinx.coroutines.flow.Flow
 
 /**

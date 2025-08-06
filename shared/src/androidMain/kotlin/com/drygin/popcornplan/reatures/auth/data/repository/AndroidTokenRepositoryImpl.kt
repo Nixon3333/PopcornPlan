@@ -3,8 +3,9 @@ package com.drygin.popcornplan.reatures.auth.data.repository
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import com.drygin.popcornplan.features.auth.domain.repository.TokenRepository
-import com.drygin.popcornplan.reatures.auth.data.datastore.tokenDataStore
 import com.drygin.popcornplan.reatures.auth.data.datastore.TokenKeys
+import com.drygin.popcornplan.reatures.auth.data.datastore.tokenDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
@@ -21,13 +22,19 @@ class AndroidTokenRepositoryImpl(
             .firstOrNull()
     }
 
+    override fun accessTokenFlow(): Flow<String?> {
+        return context.tokenDataStore.data
+            .map { it[TokenKeys.accessToken] }
+    }
+
+
     override suspend fun saveAccessToken(token: String) {
         context.tokenDataStore.edit { prefs ->
             prefs[TokenKeys.accessToken] = token
         }
     }
 
-    override suspend fun clear() {
+    override suspend fun clearToken() {
         context.tokenDataStore.edit { it.clear() }
     }
 }

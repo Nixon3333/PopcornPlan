@@ -1,4 +1,4 @@
-package com.drygin.popcornplan.features.reminder.data.remote.dto
+package com.drygin.popcornplan.features.sync.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class ReminderDto(
     val id: String,
     val userId: String,
-    val tmdbId: Int,
+    val traktId: Int,
     val title: String,
     val type: String,
     val reminderTime: Long,

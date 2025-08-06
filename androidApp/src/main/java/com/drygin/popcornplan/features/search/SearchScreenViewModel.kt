@@ -31,6 +31,9 @@ class SearchScreenViewModel(
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies = _movies.asStateFlow()
 
+    private val _favorites = MutableStateFlow<List<Int>>(emptyList())
+    val favorites = _favorites.asStateFlow()
+
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
@@ -41,6 +44,11 @@ class SearchScreenViewModel(
     val errorMessage = _errorMessage.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            favouriteUseCases.getFavourite().collect { favorites ->
+                _favorites.value = favorites.map { it.ids.trakt }
+            }
+        }
         viewModelScope.launch {
             _query
                 .debounce(300)

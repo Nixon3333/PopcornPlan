@@ -3,10 +3,9 @@ package com.drygin.popcornplan.app.di
 import androidx.lifecycle.SavedStateHandle
 import com.drygin.popcornplan.features.details.DetailsScreenViewModel
 import com.drygin.popcornplan.features.favorite.FavoriteScreenViewModel
-import com.drygin.popcornplan.features.trending.TrendingScreenViewModel
 import com.drygin.popcornplan.features.reminder.RemindersScreenViewModel
 import com.drygin.popcornplan.features.search.SearchScreenViewModel
-import com.drygin.popcornplan.features.sync.WebSocketViewModel
+import com.drygin.popcornplan.features.trending.TrendingScreenViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -21,13 +20,4 @@ val viewModelsModule = module {
     viewModel { TrendingScreenViewModel(get(), get()) }
     viewModel { RemindersScreenViewModel(get(), get(), get()) }
     viewModel { SearchScreenViewModel(get(), get()) }
-
-    viewModel {
-        WebSocketViewModel(
-            webSocketClient = get(),
-            syncEventHandler = get(),
-            get(),
-            get()
-        )
-    }
 }

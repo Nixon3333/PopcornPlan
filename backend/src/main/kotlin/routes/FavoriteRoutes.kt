@@ -1,6 +1,6 @@
 package routes
 
-import com.drygin.popcornplan.features.favorite.data.remote.dto.FavoriteDto
+import com.drygin.popcornplan.features.sync.data.remote.dto.FavoriteDto
 import config.UserPrincipal
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -33,16 +33,16 @@ fun Route.favoriteRoutes(
                 ?: return@post call.respond(HttpStatusCode.Unauthorized)
 
             val favoriteDTO = call.receive<FavoriteDto>()
-            favoriteService.add(userId, favoriteDTO.tmdbId)
+            favoriteService.add(userId, favoriteDTO.traktId)
             call.respond(HttpStatusCode.Created)
         }
 
-        delete("/{tmdbId}") {
+        delete("/{traktId}") {
             val userId = call.principal<UserPrincipal>()?.userId
                 ?: return@delete call.respond(HttpStatusCode.Unauthorized)
 
-            val tmdbId = call.parameters["tmdbId"]?.toIntOrNull()
-                ?: throw IllegalArgumentException("Missing or invalid tmdbId")
+            val tmdbId = call.parameters["traktId"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Missing or invalid traktId")
 
             favoriteService.delete(userId, tmdbId)
             call.respond(HttpStatusCode.OK)
